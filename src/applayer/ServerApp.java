@@ -5,18 +5,22 @@ import lowerlayers.TransportLayer;
 
 public class ServerApp {
     private TransportLayer transportLayer;
+    private int transDelayPerByte;
     
     /**
      * Set up a server
+     * @param propDelay
+     * @param transDelayPerByte
      */
-    public ServerApp() {
-        transportLayer = new TransportLayer(true);
+    public ServerApp(int propDelay, int transDelayPerByte) {
+        transportLayer = new TransportLayer(true, propDelay, transDelayPerByte);
+        
     }
     
     /**
      * Listen to the incoming stream
      */
-    private void listen() {
+    private void listen() throws InterruptedException {
         while (true) {
             //receive message from client, and send the "received" message back.
             byte[] byteArray = transportLayer.receive();
@@ -34,7 +38,7 @@ public class ServerApp {
     }
 
     public static void main(String[] args) throws Exception {
-        ServerApp server = new ServerApp();
+        ServerApp server = new ServerApp(100, 10);
         server.listen();
     }
 }

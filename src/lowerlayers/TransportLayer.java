@@ -1,28 +1,26 @@
 package lowerlayers;
 
-import lowerlayers.NetworkLayer;
+public class TransportLayer {
 
+    private final NetworkLayer networkLayer;
+    
 
-
-
-public class TransportLayer
-{
-
-    private NetworkLayer networkLayer;
     //server is true if the application is a server (should listen) or false if it is a client (should try and connect)
-    public TransportLayer(boolean server)
-    {
+    public TransportLayer(boolean server) {
         networkLayer = new NetworkLayer(server);
     }
-
-    public void send(byte[] payload)
-    {
-        networkLayer.send( payload );
+    
+    public TransportLayer(boolean server, int propDelay, int transDelayPerByte) {
+        networkLayer = new NetworkLayer(server, propDelay, transDelayPerByte);
     }
 
-    public byte[] receive()
-    {
-        byte[] payload = networkLayer.receive();    
+    public void send(byte[] payload) throws InterruptedException {
+        
+        networkLayer.send(payload);
+    }
+
+    public byte[] receive() {
+        byte[] payload = networkLayer.receive();
         return payload;
     }
 }
