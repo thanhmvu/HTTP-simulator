@@ -27,4 +27,8 @@ public class Packet {
     protected void addHeadings(HashMap<String, String> headings) {
         this.headings.putAll(headings);
     }
+    
+    public String getValue(String heading) {
+        return headings.get(heading);
+    }
 }

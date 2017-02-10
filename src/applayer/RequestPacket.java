@@ -68,5 +68,13 @@ public class RequestPacket extends Packet {
         protocol.append(CRLF);
         return protocol.toString();
     }
+    
+    public Method getMethod() {
+        return method;
+    }
+    
+    public String getUrl() {
+        return url;
+    }
 
 }
