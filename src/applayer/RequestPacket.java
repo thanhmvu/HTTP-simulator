@@ -22,37 +22,40 @@ public class RequestPacket extends Packet {
         this.method = Method.valueOf(method);
         this.url = url;
     }
-
     /**
-     * Convert from protocol to a response message
-     *
+     * Create a request packet using input protocol string
      * @param protocol The encoding of the message
-     * @return a ResponseMessage object
      */
-    public static RequestPacket fromProtocol(String protocol) {
+    public RequestPacket(String protocol) {
+        super();
+        parseProtocol(protocol);
+    }
+    
+    /**
+     * Parse input parameters from protocol string
+     * @param protocol The encoding of the message
+     */
+    public void parseProtocol(String protocol) {
         String[] lines = protocol.split(CRLF);
 
         if (lines.length >= 2) {
             String[] firstLineTokens = lines[0].split(SP);
-            String method = firstLineTokens[0];
-            String url = firstLineTokens[1];
+            this.method = Method.valueOf(firstLineTokens[0]);
+            this.url = firstLineTokens[1];
             String httpVersion = firstLineTokens[2];
-            double version = Double.parseDouble(httpVersion.substring(5));
+            this.version = Double.parseDouble(httpVersion.substring(5));
 
-            HashMap<String, String> headings = new LinkedHashMap<>();
             int i = 1;
             for (i = 1; i < lines.length && !lines[i].equals(CRLF); i++) {
                 String header = lines[i].substring(0, lines[i].indexOf(':'));
                 String value = lines[i].substring(lines[i].indexOf(':') + 2, lines[i].length());
-                headings.put(header, value);
+                this.headings.put(header, value);
             }
-
-            RequestPacket msg = new RequestPacket(version, method, url);
-            msg.addHeadings(headings);
-            return msg;
+        } else {
+            this.version = 1.1;
+            this.method = Method.valueOf("GET");
+            this.url = protocol;
         }
-        return new RequestPacket(1.1, "GET", protocol);
-
     }
 
     /**

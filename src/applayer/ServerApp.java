@@ -32,7 +32,7 @@ public class ServerApp {
             //convert to request packet
             String str = new String(byteArray);
             System.out.println(str);
-            RequestPacket reqPacket = RequestPacket.fromProtocol(str);
+            RequestPacket reqPacket = new RequestPacket(str);
 
             //get response
             ResponsePacket resPacket = respond(reqPacket);

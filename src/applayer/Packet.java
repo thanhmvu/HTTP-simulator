@@ -15,6 +15,13 @@ public class Packet {
     protected static final String SP = " ";
 
     /**
+     * Default constructor
+     */
+    protected Packet() {
+        headings = new LinkedHashMap<>();
+    }
+    
+    /**
      * Create a packet
      * @param version HTTP version (1.0 or 1.1)
      */
