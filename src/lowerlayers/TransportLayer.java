@@ -28,7 +28,7 @@ public class TransportLayer {
             String str = new String(byteArray);
             if (str.equals(protocol)) {
                 System.out.println(server ? "Server" : "Client" + " receives " + protocol);
-                connectionOpen = true;
+                
                 break;
             }
         }
@@ -40,8 +40,10 @@ public class TransportLayer {
         if (!server) {
             this.sendHandshakeProtocol("SYN");
             this.listenForHandshake("ACK");
+            connectionOpen = true;
         } else {
             this.listenForHandshake("SYN");
+            connectionOpen = true;
             this.sendHandshakeProtocol("ACK");
         }
     }
