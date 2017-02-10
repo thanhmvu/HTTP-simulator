@@ -31,23 +31,27 @@ public class RequestPacket extends Packet {
      */
     public static RequestPacket fromProtocol(String protocol) {
         String[] lines = protocol.split(CRLF);
-        String[] firstLineTokens = lines[0].split(SP);
-        String method = firstLineTokens[0];
-        String url = firstLineTokens[1];
-        String httpVersion = firstLineTokens[2];
-        double version = Double.parseDouble(httpVersion.substring(5));
 
-        HashMap<String, String> headings = new LinkedHashMap<>();
-        int i = 1;
-        for (i = 1; i < lines.length && !lines[i].equals(CRLF); i++) {
-            String header = lines[i].substring(0, lines[i].indexOf(':'));
-            String value = lines[i].substring(lines[i].indexOf(':') + 2, lines[i].length());
-            headings.put(header, value);
+        if (lines.length >= 2) {
+            String[] firstLineTokens = lines[0].split(SP);
+            String method = firstLineTokens[0];
+            String url = firstLineTokens[1];
+            String httpVersion = firstLineTokens[2];
+            double version = Double.parseDouble(httpVersion.substring(5));
+
+            HashMap<String, String> headings = new LinkedHashMap<>();
+            int i = 1;
+            for (i = 1; i < lines.length && !lines[i].equals(CRLF); i++) {
+                String header = lines[i].substring(0, lines[i].indexOf(':'));
+                String value = lines[i].substring(lines[i].indexOf(':') + 2, lines[i].length());
+                headings.put(header, value);
+            }
+
+            RequestPacket msg = new RequestPacket(version, method, url);
+            msg.addHeadings(headings);
+            return msg;
         }
-
-        RequestPacket msg = new RequestPacket(version, method, url);
-        msg.addHeadings(headings);
-        return msg;
+        return new RequestPacket(1.1, "GET", protocol);
 
     }
 
@@ -68,11 +72,11 @@ public class RequestPacket extends Packet {
         protocol.append(CRLF);
         return protocol.toString();
     }
-    
+
     public Method getMethod() {
         return method;
     }
-    
+
     public String getUrl() {
         return url;
     }

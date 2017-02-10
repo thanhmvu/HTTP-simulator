@@ -21,7 +21,7 @@ public class TransportLayer {
 
     private void sendHandshakeProtocol(String protocol) throws InterruptedException {
         networkLayer.send((protocol).getBytes());
-        System.out.println(server ? "Server" : "Client" + " sends " + protocol);
+        System.out.println(server ? "Server sends " + protocol : "Client sends " + protocol);
     }
 
     private void listenForHandshake(String protocol) throws InterruptedException {
@@ -33,7 +33,7 @@ public class TransportLayer {
             }
             String str = new String(byteArray);
             if (str.equals(protocol)) {
-                System.out.println(server ? "Server" : "Client" + " receives " + protocol);
+                System.out.println(server ? "Server receives " + protocol: "Client receives " + protocol);
 
                 break;
             }
