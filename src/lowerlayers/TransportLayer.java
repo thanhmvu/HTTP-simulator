@@ -6,7 +6,13 @@ public class TransportLayer {
     boolean connectionOpen;
     boolean server;
 
-    //server is true if the application is a server (should listen) or false if it is a client (should try and connect)
+    /**
+     * Build transport layer
+     * @param server server is true if the application is a server (should
+     * listen) or false if it is a client (should try and connect)
+     * @param propDelay Propagation delay (ms)
+     * @param transDelayPerByte Transmission delay per second (ms)
+     */
     public TransportLayer(boolean server, int propDelay, int transDelayPerByte) {
         networkLayer = new NetworkLayer(server, propDelay, transDelayPerByte);
         this.server = server;
@@ -28,7 +34,7 @@ public class TransportLayer {
             String str = new String(byteArray);
             if (str.equals(protocol)) {
                 System.out.println(server ? "Server" : "Client" + " receives " + protocol);
-                
+
                 break;
             }
         }
