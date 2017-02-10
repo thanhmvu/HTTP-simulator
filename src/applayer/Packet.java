@@ -9,13 +9,13 @@ import java.util.LinkedHashMap;
  *
  * @author hongha912
  */
-public class Message {
+public class Packet {
     
     protected HashMap<String, String> headings;
     protected double version;
     protected static final String CRLF = "\r\n";
     protected static final String SP = " ";
-    protected Message(double version) {
+    protected Packet(double version) {
         this.version = version;
         headings = new LinkedHashMap<>();
     }

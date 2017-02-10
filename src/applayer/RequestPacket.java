@@ -1,6 +1,6 @@
 package applayer;
 
-import static applayer.Message.CRLF;
+import static applayer.Packet.CRLF;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
@@ -8,7 +8,7 @@ import java.util.LinkedHashMap;
  *
  * @author hongha912
  */
-public class RequestMessage extends Message {
+public class RequestPacket extends Packet {
 
     protected enum Method {
         GET, POST;
@@ -17,7 +17,7 @@ public class RequestMessage extends Message {
     protected Method method;
     protected String url;
 
-    public RequestMessage(double version, String method, String url) {
+    public RequestPacket(double version, String method, String url) {
         super(version);
         this.method = Method.valueOf(method);
         this.url = url;
@@ -29,7 +29,7 @@ public class RequestMessage extends Message {
      * @param protocol The encoding of the message
      * @return a ResponseMessage object
      */
-    public static RequestMessage fromProtocol(String protocol) {
+    public static RequestPacket fromProtocol(String protocol) {
         String[] lines = protocol.split(CRLF);
         String[] firstLineTokens = lines[0].split(SP);
         String method = firstLineTokens[0];
@@ -45,7 +45,7 @@ public class RequestMessage extends Message {
             headings.put(header, value);
         }
 
-        RequestMessage msg = new RequestMessage(version, method, url);
+        RequestPacket msg = new RequestPacket(version, method, url);
         msg.addHeadings(headings);
         return msg;
 

@@ -7,13 +7,13 @@ import java.util.LinkedHashMap;
  *
  * @author hongha912
  */
-public class ResponseMessage extends Message {
+public class ResponsePacket extends Packet {
 
     protected int statusCode;
     protected String phrase;
     protected String body;
 
-    public ResponseMessage(double version, int statusCode, String phrase, String body) {
+    public ResponsePacket(double version, int statusCode, String phrase, String body) {
         super(version);
         this.statusCode = statusCode;
         this.phrase = phrase;
@@ -25,7 +25,7 @@ public class ResponseMessage extends Message {
      * @param protocol The encoding of the message
      * @return a ResponseMessage object
      */
-    public static ResponseMessage fromProtocol(String protocol) {
+    public static ResponsePacket fromProtocol(String protocol) {
         String[] lines = protocol.split(CRLF);
         String[] firstLineTokens = lines[0].split(SP);
         String httpVersion = firstLineTokens[0];
@@ -45,7 +45,7 @@ public class ResponseMessage extends Message {
             body += CRLF + lines[i];
         }
 
-        ResponseMessage msg = new ResponseMessage(version, statusCode, phrase, body);
+        ResponsePacket msg = new ResponsePacket(version, statusCode, phrase, body);
         msg.addHeadings(headings);
         return msg;
 
