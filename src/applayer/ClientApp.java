@@ -3,26 +3,63 @@ package applayer;
 import lowerlayers.TransportLayer;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 //This class represents the client application
 public class ClientApp {
+    TransportLayer transportLayer;
+    
+    public ClientApp(int propDelay, int transDelayPerByte){
+        //create a new transport layer for client (hence false)
+        boolean isServer = false;
+        transportLayer = new TransportLayer(isServer, propDelay, transDelayPerByte);
+    }
+    
+    public void readInput(){
+        try{
+            //read in first line from keyboard
+            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+            String line = reader.readLine();
 
-    public static void main(String[] args) throws Exception {
-        //create a new transport layer for client (hence false) (connect to server), and read in first line from keyboard
-        TransportLayer transportLayer = new TransportLayer(false, 0, 0);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        String line = reader.readLine();
-
-        //while line is not empty
-        while (line != null && !line.equals("")) {
-            //convert lines into byte array, send to transoport layer and wait for response
-            byte[] byteArray = line.getBytes();
-            transportLayer.send(byteArray);
-            byteArray = transportLayer.receive();
-            String str = new String(byteArray);
-            System.out.println(str);
-            //read next line
-            line = reader.readLine();
+            //while line is not empty
+            while (line != null && !line.equals("")) {
+                request(line);
+                receive();
+                //read next line
+                line = reader.readLine();
+            }
+        }catch (Exception e){
+            System.out.println("Error mess: "+e);
         }
+    }
+    
+    public void request(String request){
+        try {
+            //convert lines into byte array, send to transoport layer and wait for response
+            byte[] byteArray = request.getBytes();
+            transportLayer.send(byteArray);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(ClientApp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public void receive(){
+        try {
+            byte[] byteArray = transportLayer.receive();
+            String str = new String(byteArray);
+            display(str);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(ClientApp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public void display(String content){
+        System.out.println(content);
+    }
+    
+    public static void main(String[] args) throws Exception {
+        ClientApp client = new ClientApp(0,0);
+        client.readInput();
     }
 }
