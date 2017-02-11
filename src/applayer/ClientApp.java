@@ -1,7 +1,7 @@
 package applayer;
 
 import util.Config;
-import lowerlayers.TransportLayer;
+//import lowerlayers.TransportLayer;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.logging.Level;
@@ -9,12 +9,14 @@ import java.util.logging.Logger;
 
 //This class represents the client application
 public class ClientApp {
-    TransportLayer transportLayer;
+//    TransportLayer transportLayer;
+    LocalCache localCache;
     
     public ClientApp(int propDelay, int transDelayPerByte){
         //create a new transport layer for client (hence false)
         boolean isServer = false;
-        transportLayer = new TransportLayer(isServer, propDelay, transDelayPerByte);
+//        transportLayer = new TransportLayer(isServer, propDelay, transDelayPerByte);
+        localCache = new LocalCache(); 
     }
     
     public void run(){
@@ -25,35 +27,16 @@ public class ClientApp {
 
             //while line is not empty
             while (line != null && !line.equals("")) {
-                request(line);
-                receive();
+                String content = localCache.requestAndReceive(line, null);
+                display(content);
                 //read next line
                 line = reader.readLine();
             }
-        }catch (Exception e){
-            System.out.println("Error mess: "+e);
-        }
-    }
-    
-    public void request(String request){
-        try {
-            //convert lines into byte array, send to transoport layer and wait for response
-            byte[] byteArray = request.getBytes();
-            transportLayer.send(byteArray);
-        } catch (InterruptedException ex) {
+        }catch (Exception ex){
             Logger.getLogger(ClientApp.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
-    public void receive(){
-        try {
-            byte[] byteArray = transportLayer.receive();
-            String str = new String(byteArray);
-            display(str);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(ClientApp.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
     
     public void display(String content){
         System.out.println(content);
