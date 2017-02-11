@@ -1,5 +1,6 @@
 package applayer;
 
+import util.Config;
 import lowerlayers.TransportLayer;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -16,7 +17,7 @@ public class ClientApp {
         transportLayer = new TransportLayer(isServer, propDelay, transDelayPerByte);
     }
     
-    public void readInput(){
+    public void run(){
         try{
             //read in first line from keyboard
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -59,7 +60,9 @@ public class ClientApp {
     }
     
     public static void main(String[] args) throws Exception {
-        ClientApp client = new ClientApp(0,0);
-        client.readInput();
+        System.out.println();
+        ClientApp client = new ClientApp(Config.PROP_DELAY,Config.TRANS_DELAY_PER_BYTE);
+        System.out.println("Send requests to server:");
+        client.run();
     }
 }

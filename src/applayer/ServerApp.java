@@ -116,6 +116,7 @@ public class ServerApp {
 
     public static void main(String[] args) throws Exception {
         ServerApp server = new ServerApp(100, 10);
+        System.out.println("The server is listenting ...");
         server.listen();
     }
 }
