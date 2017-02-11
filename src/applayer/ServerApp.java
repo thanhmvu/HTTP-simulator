@@ -6,11 +6,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import lowerlayers.TransportLayer;
 
+/**
+ * This application runs the server, find the file, send it back to the client upon request.
+ * @author hongha912
+ */
 public class ServerApp {
 
     private TransportLayer transportLayer;
@@ -59,30 +62,54 @@ public class ServerApp {
      * @return The ResponsePacket that is appropriate
      */
     private ResponsePacket respond(RequestPacket reqPacket) {
-        //detect request type and do stuff
-        ResponsePacket response = this.respondToGet(reqPacket);
+
+        ResponsePacket response = null;
+        switch (reqPacket.getMethod()) {
+            case GET:
+                response = this.respondToGetReq(reqPacket);
+                break;
+            case POST:
+                break;
+        }
         return response;
     }
 
-    private ResponsePacket respondToGet(RequestPacket reqPacket) {
+    /**
+     * Draft a ResponsePacket to respond to a GET request
+     *
+     * @param reqPacket Request packet
+     * @return Response packet
+     */
+    private ResponsePacket respondToGetReq(RequestPacket reqPacket) {
         String url = reqPacket.getUrl();
         Path path = Paths.get(url);
         byte[] encoded;
-        
-        
+
+        //get cache modified time (if exist)
         String cacheModifiedTimeStr = reqPacket.getValue("If-modified-since");
-        //FileTime cacheModifiedTime = FileTime.from(LocalDateTime.parse(cacheModifiedTimeStr, DateTimeFormatter.ISO_DATE).toInstant(ZoneOffset.UTC));
+        FileTime cacheModifiedTime = null;
         if (cacheModifiedTimeStr != null) {
-            
-                        
+            long milis;
+            try {
+                milis = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss").parse(cacheModifiedTimeStr).getTime();
+                cacheModifiedTime = FileTime.fromMillis(milis);
+            } catch (ParseException ex) {
+            }
         }
-        //ADD CHECK FOR IF-MODIFIED
+
         try {
-            encoded = Files.readAllBytes(path);
+            //check for modified time
             FileTime fileModifiedTime = Files.getLastModifiedTime(path);
+            if (cacheModifiedTime != null && fileModifiedTime.compareTo(cacheModifiedTime) > 0) {
+                return new ResponsePacket(reqPacket.getVersion(), 304, "Not Modified", "");
+            }
+
+            //read file and send file
+            encoded = Files.readAllBytes(path);
             String body = new String(encoded, StandardCharsets.UTF_8);
             return new ResponsePacket(reqPacket.getVersion(), 200, "OK", body);
         } catch (IOException ex) {
+            //file not found
             return new ResponsePacket(reqPacket.getVersion(), 404, "Not Found", "");
         }
     }
