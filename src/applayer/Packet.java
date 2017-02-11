@@ -48,7 +48,7 @@ public class Packet {
      * @param headings an existing heading-value map
      */
     protected void addHeadings(HashMap<String, String> headings) {
-        this.headings.putAll(headings);
+        if(headings != null) this.headings.putAll(headings);
     }
 
     public String getValue(String heading) {
