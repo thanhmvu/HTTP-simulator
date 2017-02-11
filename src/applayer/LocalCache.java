@@ -41,6 +41,13 @@ public class LocalCache {
     }
     
     public String requestAndReceive(String url, HashMap<String,String> headers) throws InterruptedException{
+        request(url, headers);   
+        String response = receive();
+        
+        return response;
+    }
+    
+    private void request(String url, HashMap<String,String> headers) throws InterruptedException{
         RequestPacket reqPacket = new RequestPacket(Config.HTTP_VERSION,"GET",url);
         reqPacket.addHeadings(headers);
         
@@ -56,9 +63,10 @@ public class LocalCache {
         // convert request to byte array and send to transport layer
         byte[] byteArray = reqPacket.toProtocol().getBytes();
         transportLayer.send(byteArray);
-        
-        // get and return the response
-        byteArray = transportLayer.receive();
+    }
+    
+    private String receive() throws InterruptedException{
+        byte[] byteArray = transportLayer.receive();
         return new String(byteArray);
     }
 }

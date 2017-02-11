@@ -45,7 +45,7 @@ public class ClientApp {
     public static void main(String[] args) throws Exception {
         System.out.println();
         ClientApp client = new ClientApp(Config.PROP_DELAY,Config.TRANS_DELAY_PER_BYTE);
-        System.out.println("Send requests to server:");
+        System.out.println("This is Client App. Request to server:");
         client.run();
     }
 }
