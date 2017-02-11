@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 
 /**
  * A packet is the basis for a message sent through the network
+ *
  * @author hongha912
  */
 public class Packet {
@@ -20,18 +21,20 @@ public class Packet {
     protected Packet() {
         headings = new LinkedHashMap<>();
     }
-    
+
     /**
      * Create a packet
+     *
      * @param version HTTP version (1.0 or 1.1)
      */
     protected Packet(double version) {
+        this();
         this.version = version;
-        headings = new LinkedHashMap<>();
     }
 
     /**
      * Add a heading and value to the packet
+     *
      * @param heading Add a heading
      * @param value Add a value
      */
@@ -41,6 +44,7 @@ public class Packet {
 
     /**
      * Add many heading-value pairs to the packet
+     *
      * @param headings an existing heading-value map
      */
     protected void addHeadings(HashMap<String, String> headings) {
@@ -49,5 +53,9 @@ public class Packet {
 
     public String getValue(String heading) {
         return headings.get(heading);
+    }
+
+    public double getVersion() {
+        return version;
     }
 }
