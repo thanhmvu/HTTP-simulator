@@ -1,4 +1,5 @@
 package lowerlayers;
+import util.Config;
 
 public class TransportLayer {
 
@@ -59,6 +60,12 @@ public class TransportLayer {
             handShake();
         }
         networkLayer.send(payload);
+        
+        // if non-persistent, Close connection when client received the packet
+        if (Config.HTTP_VERSION == 1.0 && server){
+            System.out.println("Server closes connection");
+            connectionOpen = false;
+        }
     }
 
     public byte[] receive() throws InterruptedException {
@@ -66,6 +73,12 @@ public class TransportLayer {
             handShake();
         }
         byte[] payload = networkLayer.receive();
+        
+        // if non-persistent, Close connection when client received the packet
+        if (Config.HTTP_VERSION == 1.0 && !server){
+            System.out.println("Client closes connection");
+            connectionOpen = false;
+        }
         return payload;
     }
 }

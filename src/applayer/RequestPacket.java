@@ -1,5 +1,6 @@
 package applayer;
 
+import util.Config;
 import static applayer.Packet.CRLF;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -52,7 +53,7 @@ public class RequestPacket extends Packet {
                 this.headings.put(header, value);
             }
         } else {
-            this.version = 1.1;
+            this.version = Config.HTTP_VERSION;
             this.method = Method.valueOf("GET");
             this.url = protocol;
         }
