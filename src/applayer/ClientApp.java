@@ -3,6 +3,7 @@ package applayer;
 import util.Config;
 //import lowerlayers.TransportLayer;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,17 +29,22 @@ public class ClientApp {
             //while line is not empty
             while (line != null && !line.equals("")) {
                 String url = line;
+                
+                long start = System.currentTimeMillis();
                 RequestPacket reqPacket = new RequestPacket(Config.HTTP_VERSION,"GET",url);
                 String content = localCache.requestAndReceive(reqPacket);
+                long end = System.currentTimeMillis();
+                System.out.println("Response time: "+ (end-start) + " ms");
+                
                 display(content);
+                
                 //read next line
                 line = reader.readLine();
             }
-        }catch (Exception ex){
+        }catch (IOException | InterruptedException ex){
             Logger.getLogger(ClientApp.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
     
     public void display(String content){
         System.out.println("Server responses: "+content);
