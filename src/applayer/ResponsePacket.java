@@ -73,4 +73,7 @@ public class ResponsePacket extends Packet {
         return protocol.toString();
     }
 
+    public int getStatusCode(){
+        return statusCode;
+    }
 }
