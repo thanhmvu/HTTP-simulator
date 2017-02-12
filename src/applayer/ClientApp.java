@@ -27,7 +27,9 @@ public class ClientApp {
 
             //while line is not empty
             while (line != null && !line.equals("")) {
-                String content = localCache.requestAndReceive(line, null);
+                String url = line;
+                RequestPacket reqPacket = new RequestPacket(Config.HTTP_VERSION,"GET",url);
+                String content = localCache.requestAndReceive(reqPacket);
                 display(content);
                 //read next line
                 line = reader.readLine();
@@ -39,7 +41,7 @@ public class ClientApp {
     
     
     public void display(String content){
-        System.out.println(content);
+        System.out.println("Server responses: "+content);
     }
     
     public static void main(String[] args) throws Exception {
