@@ -126,9 +126,17 @@ public class DocumentTest {
         String result = doc.getFullText();
         assertEquals(expResult,result);
         
-        // text not available
+        // no embedded text
         url = "./test1.txt";
-        String content = "abc <<./test2.txt>> def \nxyz";
+        String content = "abc ./test2.txt def \nxyz";
+        doc = new Document(url,content);
+        expResult = content;
+        result = doc.getFullText();
+        assertEquals(expResult,result);
+        
+        // embedded text not available
+        url = "./test1.txt";
+        content = "abc <<./test2.txt>> def \nxyz";
         doc = new Document(url,content);
         expResult = content;
         result = doc.getFullText();
