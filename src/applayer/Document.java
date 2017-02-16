@@ -75,6 +75,10 @@ public class Document {
         return false;
     }
     
+    public void addEmbdDoc(String embdFile, Document doc){
+        embdDocs.put(embdFile, doc);
+    }
+    
     public String getEmbdContent(String embdFile){
         return this.embdDocs.get(embdFile).getContent();
     }
