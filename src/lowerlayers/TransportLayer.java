@@ -54,7 +54,7 @@ public class TransportLayer {
             this.sendHandshakeProtocol("ACK");
         }
     }
-
+    
     public void send(byte[] payload) throws InterruptedException {
         if (!connectionOpen) {
             handShake();
