@@ -1,6 +1,7 @@
 package applayer;
 
 import static applayer.Packet.CRLF;
+import java.util.Scanner;
 
 /**
  * Implements the request HTTP packet
@@ -51,21 +52,19 @@ public class RequestPacket extends Packet {
      * @param protocol The encoding of the message
      */
     private void parseProtocol(String protocol) {
-        String[] lines = protocol.split(CRLF);
+        try (Scanner sc = new Scanner(protocol)) {
+            //parse first line
+            this.method = Method.valueOf(sc.next());
+            this.url = sc.next();
+            String httpVersion = sc.next();
+            this.version = Double.parseDouble(httpVersion.substring(5));
 
-        //parse first line
-        String[] firstLineTokens = lines[0].split(SP);
-        this.method = Method.valueOf(firstLineTokens[0]);
-        this.url = firstLineTokens[1];
-        String httpVersion = firstLineTokens[2];
-        this.version = Double.parseDouble(httpVersion.substring(5));
-
-        //parse headers
-        int i;
-        for (i = 1; i < lines.length && !lines[i].equals(""); i++) {
-            String header = lines[i].substring(0, lines[i].indexOf(':'));
-            String value = lines[i].substring(lines[i].indexOf(':') + 2, lines[i].length());
-            this.headings.put(header, value);
+            while (sc.hasNext("\\w+:")) {
+                String header = sc.next();
+                header = header.substring(0, header.indexOf(':'));
+                String value = sc.next() + sc.nextLine();
+                this.headings.put(header, value);
+            }
         }
 
     }

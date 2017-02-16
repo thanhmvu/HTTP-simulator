@@ -32,7 +32,7 @@ public class LocalCache {
     
     public LocalCache(){
         cacheDir = "../../assets/local-cached-files/";
-        caches = new HashMap<String,CachedObject>();
+        caches = new HashMap<>();
         
         boolean isServer = false;
         transportLayer = new TransportLayer(isServer, Config.PROP_DELAY,Config.TRANS_DELAY_PER_BYTE);

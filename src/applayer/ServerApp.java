@@ -1,6 +1,5 @@
 package applayer;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -8,13 +7,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import lowerlayers.TransportLayer;
+import util.Config;
 
 /**
- * This application runs the server, find the file, send it back to the client upon request.
+ * This application runs the server, find the file, send it back to the client
+ * upon request.
+ *
  * @author hongha912
  */
 public class ServerApp {
@@ -52,8 +51,7 @@ public class ServerApp {
             //get response
             ResponsePacket resPacket = respond(reqPacket);
             String response = resPacket.toProtocol();
-            byteArray = response.getBytes();
-            transportLayer.send(byteArray);
+            transportLayer.send(response.getBytes());
 
         }
     }
@@ -89,32 +87,34 @@ public class ServerApp {
         byte[] encoded;
 
         //get cache modified time (if exist)
+        Long cacheModifiedTime = null;
         String cacheModifiedTimeStr = reqPacket.getValue("If-modified-since");
-        FileTime cacheModifiedTime = null;
-        if (cacheModifiedTimeStr != null) {
-            long milis;
+        if (cacheModifiedTimeStr != null) {           
             try {
-                milis = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss").parse(cacheModifiedTimeStr).getTime();
-                cacheModifiedTime = FileTime.fromMillis(milis);
+                cacheModifiedTime = Config.HTTP_TIME_FORMAT.parse(cacheModifiedTimeStr).getTime();
             } catch (ParseException ex) {
             }
         }
 
         try {
             //check for modified time
-//            FileTime fileModifiedTime = Files.getLastModifiedTime(path);
-//            if (cacheModifiedTime != null && fileModifiedTime.compareTo(cacheModifiedTime) > 0) {
-//                return new ResponsePacket(reqPacket.getVersion(), 304, "Not Modified", "");
-//            }
+            FileTime fileModifiedTime = Files.getLastModifiedTime(path);
+            if (cacheModifiedTime != null && fileModifiedTime.toMillis() == cacheModifiedTime) {
+                return new ResponsePacket(reqPacket.getVersion(), 304, "Not Modified", "");
+            }
 
             //read file and send file
             encoded = Files.readAllBytes(path);
             String body = new String(encoded, StandardCharsets.UTF_8);
-            return new ResponsePacket(reqPacket.getVersion(), 200, "OK", body);
+            
+            //create packet with last-modified
+            ResponsePacket resPacket = new ResponsePacket(reqPacket.getVersion(), 200, "OK", body);
+            resPacket.addHeading("Last-Modified", Config.HTTP_TIME_FORMAT.format(fileModifiedTime.toMillis()));
+            return resPacket;
         } catch (IOException ex) {
             //file not found
             return new ResponsePacket(reqPacket.getVersion(), 404, "Not Found", "");
-        } 
+        }
     }
 
     public static void main(String[] args) throws Exception {
