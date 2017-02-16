@@ -1,5 +1,6 @@
 package applayer;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -8,6 +9,8 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import lowerlayers.TransportLayer;
 
 /**
@@ -99,10 +102,10 @@ public class ServerApp {
 
         try {
             //check for modified time
-            FileTime fileModifiedTime = Files.getLastModifiedTime(path);
-            if (cacheModifiedTime != null && fileModifiedTime.compareTo(cacheModifiedTime) > 0) {
-                return new ResponsePacket(reqPacket.getVersion(), 304, "Not Modified", "");
-            }
+//            FileTime fileModifiedTime = Files.getLastModifiedTime(path);
+//            if (cacheModifiedTime != null && fileModifiedTime.compareTo(cacheModifiedTime) > 0) {
+//                return new ResponsePacket(reqPacket.getVersion(), 304, "Not Modified", "");
+//            }
 
             //read file and send file
             encoded = Files.readAllBytes(path);
@@ -111,7 +114,7 @@ public class ServerApp {
         } catch (IOException ex) {
             //file not found
             return new ResponsePacket(reqPacket.getVersion(), 404, "Not Found", "");
-        }
+        } 
     }
 
     public static void main(String[] args) throws Exception {

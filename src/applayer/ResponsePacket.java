@@ -43,7 +43,7 @@ public class ResponsePacket extends Packet {
         this.phrase = firstLineTokens[2];
         
         int i = 1;
-        for (i = 1; i < lines.length && !lines[i].equals(CRLF); i++) {
+        for (i = 1; i < lines.length && !lines[i].equals(""); i++) {
             String header = lines[i].substring(0, lines[i].indexOf(':'));
             String value = lines[i].substring(lines[i].indexOf(':') + 2, lines[i].length());
             this.headings.put(header, value);
