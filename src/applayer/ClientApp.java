@@ -36,7 +36,7 @@ public class ClientApp {
                 long end = System.currentTimeMillis();
                 System.out.println("Response time: "+ (end-start) + " ms");
                 
-                display(content);
+                System.out.println(content);
                 
                 //read next line
                 line = reader.readLine();
@@ -46,8 +46,45 @@ public class ClientApp {
         }
     }
     
-    public void display(String content){
-        System.out.println("Server responses: "+content);
+    public void runExperiment(){
+        String url = "parent.txt";
+        Document doc = request(url);
+        display(doc);
+    }
+    
+    /**
+     * Request and retrieve a Document object of a file
+     * 
+     * @param url The URL of the file
+     * @return The document representing the file
+     */
+    public Document request(String url){
+        Document doc = null;
+        try {
+            long start = System.currentTimeMillis();
+            RequestPacket reqPacket = new RequestPacket(Config.HTTP_VERSION,"GET",url);
+            String content = localCache.requestAndReceive(reqPacket);
+            long end = System.currentTimeMillis();
+            System.out.println("Time to get "+ url +" : "+ (end-start) + " ms");
+            
+            // Convert content to Document
+            doc = new Document(url,content);
+            
+            // recursively retrieve embedded files
+            doc.getEmbdFiles().forEach((Document file) -> {
+                Document embdContent = this.request(file.getUrl());
+                file.addEmbdDoc(url,embdContent);
+            });
+            
+        } catch (InterruptedException ex) {
+            Logger.getLogger(ClientApp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return doc;
+    }
+    
+    public void display(Document doc){
+        System.out.println("Server responses: "+doc.getFullText());
     }
     
     public static void main(String[] args) throws Exception {
