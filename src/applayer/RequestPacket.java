@@ -36,10 +36,10 @@ public class RequestPacket extends Packet {
      * Parse input parameters from protocol string
      * @param protocol The encoding of the message
      */
-    public void parseProtocol(String protocol) {
+    private void parseProtocol(String protocol) {
         String[] lines = protocol.split(CRLF);
 
-        if (lines.length >= 2) {
+        if (lines.length > 0) {
             String[] firstLineTokens = lines[0].split(SP);
             this.method = Method.valueOf(firstLineTokens[0]);
             this.url = firstLineTokens[1];
