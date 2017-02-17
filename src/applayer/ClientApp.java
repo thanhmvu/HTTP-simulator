@@ -45,7 +45,7 @@ public class ClientApp {
             RequestPacket reqPacket = new RequestPacket(Config.HTTP_VERSION,"GET",url);
             String content = localCache.requestAndReceive(reqPacket);
             long end = System.currentTimeMillis();
-            System.out.println("Time to get "+ url +" : "+ (end-start) + " ms");
+            print("Time to get "+ url +" : "+ (end-start) + " ms");
             
             // Convert content to Document
             doc = new Document(url,content);
@@ -81,9 +81,9 @@ public class ClientApp {
                 RequestPacket reqPacket = new RequestPacket(Config.HTTP_VERSION,"GET",url);
                 String content = localCache.requestAndReceive(reqPacket);
                 long end = System.currentTimeMillis();
-                System.out.println("Response time: "+ (end-start) + " ms");
+                print("Response time: "+ (end-start) + " ms");
                 
-                System.out.println(content);
+                print(content);
                 
                 //read next line
                 line = reader.readLine();
@@ -99,9 +99,17 @@ public class ClientApp {
      * @param doc the document object to display
      */
     public void display(Document doc){
-        System.out.println("Server responses: "+doc.getFullText());
+        print("Server responses: \n"+doc.getFullText());
     }
     
+    /**
+     * Method to print client logs in a specific format
+     * 
+     * @param s string to print
+     */
+    public static void print(String s){
+        System.out.println(">>>>> [CA] "+s);
+    }
     
     /** ========================= Experiment Methods ======================= **/
     /**
@@ -109,6 +117,7 @@ public class ClientApp {
      */
     public void runExperiment(){
         String url = "parent.txt";
+        print("requesting "+url+" ...");
         Document doc = request(url);
         display(doc);
     }
@@ -139,7 +148,7 @@ public class ClientApp {
     public static void main(String[] args) throws Exception {
         System.out.println();
         ClientApp client = new ClientApp();
-        System.out.println("This is Client App. Request to server:");
+        print("This is Client App:");
 //        client.run();
         client.runExperiment();
     }
