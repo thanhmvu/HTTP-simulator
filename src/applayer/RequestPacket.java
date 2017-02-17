@@ -59,7 +59,7 @@ public class RequestPacket extends Packet {
             String httpVersion = sc.next();
             this.version = Double.parseDouble(httpVersion.substring(5));
 
-            while (sc.hasNext("\\w+:")) {
+            while (sc.hasNext(".+:")) {
                 String header = sc.next();
                 header = header.substring(0, header.indexOf(':'));
                 String value = sc.next() + sc.nextLine();

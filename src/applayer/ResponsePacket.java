@@ -3,6 +3,7 @@ package applayer;
 import java.util.Scanner;
 
 /**
+ * Response packet
  *
  * @author hongha912
  */
@@ -46,7 +47,7 @@ public class ResponsePacket extends Packet {
             this.statusCode = sc.nextInt();
             this.phrase = sc.next() + sc.nextLine();
 
-            while (sc.hasNext("\\w+:")) {
+            while (sc.hasNext(".+:")) {
                 String header = sc.next();
                 header = header.substring(0, header.indexOf(':'));
                 String value = sc.next() + sc.nextLine();
@@ -55,9 +56,8 @@ public class ResponsePacket extends Packet {
         }
 
         String[] headerBody = protocol.split(CRLF + CRLF);
-        if (headerBody.length > 1) {
-            this.body = headerBody[1];
-        }
+        this.body = headerBody.length > 1 ? headerBody[1] : "";
+
     }
 
     /**
@@ -65,10 +65,7 @@ public class ResponsePacket extends Packet {
      *
      * Protocol format is as below:
      * [HTTP/version][SP][statusCode][SP][phrase][CRLF]
-     * [heading1:][SP][value1][CRLF] 
-     * [heading2:][SP][value2][CRLF] 
-     * [CRLF] 
-     * [body]
+     * [heading1:][SP][value1][CRLF] [heading2:][SP][value2][CRLF] [CRLF] [body]
      *
      * @return Protocol The string to be transmitted to network
      */
