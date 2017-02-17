@@ -68,7 +68,7 @@ public class LocalCache {
         String requestedObj = null;
         switch (resPacket.getStatusCode()) {
             case 200: // OK
-                requestedObj = resPacket.toProtocol();
+                requestedObj = resPacket.getBody();
                 // cache the recieved object
                 CachedObject objToCache = new CachedObject(reqPacket.getUrl(), 
                         resPacket.getValue("Last-Modified"), requestedObj);
@@ -79,7 +79,7 @@ public class LocalCache {
                 requestedObj = cachedObj.content;
                 break;
             case 404: // Not found
-                requestedObj = resPacket.toProtocol();
+                requestedObj = resPacket.getBody();
         }
         
         return requestedObj;

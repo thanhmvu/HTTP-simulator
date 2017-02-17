@@ -85,4 +85,8 @@ public class ResponsePacket extends Packet {
     public int getStatusCode() {
         return statusCode;
     }
+    
+    public String getBody(){
+            return body;
+    }
 }
