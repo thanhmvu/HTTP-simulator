@@ -19,6 +19,7 @@ import util.Config;
 public class ServerApp {
 
     private TransportLayer transportLayer;
+    private String root = "assets/server-db/";
 
     /**
      * Set up a server
@@ -82,7 +83,7 @@ public class ServerApp {
      * @return Response packet
      */
     private ResponsePacket respondToGetReq(RequestPacket reqPacket) {
-        String url = reqPacket.getUrl();
+        String url = root + reqPacket.getUrl();
         Path path = Paths.get(url);
         byte[] encoded;
 
