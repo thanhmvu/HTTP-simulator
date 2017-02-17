@@ -73,9 +73,11 @@ public class LocalCache {
                 CachedObject objToCache = new CachedObject(reqPacket.getUrl(), 
                         resPacket.getValue("Last-Modified"), requestedObj);
                 caches.put(reqPacket.getUrl(), objToCache);
+                break;
             case 304: // Not modified
                 CachedObject cachedObj = caches.get(reqPacket.getUrl());
                 requestedObj = cachedObj.content;
+                break;
             case 404: // Not found
                 requestedObj = resPacket.toProtocol();
         }
