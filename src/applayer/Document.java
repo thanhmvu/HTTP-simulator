@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- *
+ * Create the document displayed in client
  * @author thanhvu
  */
 public class Document {    
@@ -15,12 +15,21 @@ public class Document {
     String CLOSE = ">>";
     HashMap<String,Document> embdDocs;
     
+    /**
+     * Create a document with only URL (content unavailable)
+     * @param url The URL of the document
+     */
     public Document(String url){
         this.url = url;
         this.content = OPEN + url + CLOSE; // text is not available
         this.embdDocs = new HashMap<>();
     }
     
+    /**
+     * Create a document
+     * @param url The URL of the document
+     * @param content The content of the document
+     */
     public Document(String url, String content){
         this.url = url;
         this.content = content;
@@ -29,6 +38,9 @@ public class Document {
         this.findEmbdFiles();
     }
     
+    /**
+     * Find all embedded files in the content of the document
+     */
     private void findEmbdFiles(){ 
         int start = content.indexOf(OPEN,0);
         int end = content.indexOf(CLOSE,0);
@@ -41,10 +53,19 @@ public class Document {
     	}
     }
     
+    
+    /**
+     * Get the URL
+     * @return The URL of the document
+     */
     public String getUrl(){
         return url;
     }
     
+    /**
+     * Get the list of document embedded
+     * @return the embedded documents
+     */
     public ArrayList<Document> getEmbdFiles(){
         if(embdDocs.isEmpty()){
             this.findEmbdFiles();
@@ -52,6 +73,10 @@ public class Document {
         return new ArrayList<>(embdDocs.values());
     }
     
+    /**
+     * Get the full text of the document, including embedded docs
+     * @return The full text of the document, including embedded docs
+     */
     public String getFullText(){
         String full_text = this.content;
         for(String embdUrl: embdDocs.keySet()){
