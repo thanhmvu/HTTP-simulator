@@ -51,10 +51,10 @@ public class ClientApp {
             doc = new Document(url,content);
             
             // recursively retrieve embedded files
-            doc.getEmbdFiles().forEach((Document file) -> {
+            for(Document file: doc.getEmbdFiles()) {
                 Document embdContent = this.request(file.getUrl());
-                file.addEmbdDoc(url,embdContent);
-            });
+                doc.addEmbdDoc(file.getUrl(),embdContent);
+            }
             
         } catch (InterruptedException ex) {
             Logger.getLogger(ClientApp.class.getName()).log(Level.SEVERE, null, ex);
@@ -140,6 +140,7 @@ public class ClientApp {
         System.out.println();
         ClientApp client = new ClientApp();
         System.out.println("This is Client App. Request to server:");
-        client.run();
+//        client.run();
+        client.runExperiment();
     }
 }
