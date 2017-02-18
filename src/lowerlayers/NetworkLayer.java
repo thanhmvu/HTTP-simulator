@@ -16,13 +16,8 @@ public class NetworkLayer {
      */
     public NetworkLayer(boolean server, int propDelay, int transDelayPerByte) {
         linkLayer = new LinkLayer(server);
-        if (server) {
-            this.propDelay = propDelay;
-            this.transDelayPerByte = transDelayPerByte;
-        } else {
-            this.propDelay = 0;
-            this.transDelayPerByte = 0;
-        }
+        this.propDelay = propDelay;
+        this.transDelayPerByte = transDelayPerByte;
     }
 
     /**
