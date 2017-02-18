@@ -16,13 +16,15 @@ public class TransportLayer {
      */
     public TransportLayer(boolean server, int propDelay, int transDelayPerByte) {
         networkLayer = new NetworkLayer(server, propDelay, transDelayPerByte);
+        print("trans prop: "+propDelay);
+        print("trans trans: "+transDelayPerByte);
         this.server = server;
         connectionOpen = false;
     }
 
     private void sendHandshakeProtocol(String protocol) throws InterruptedException {
         networkLayer.send((protocol).getBytes());
-        System.out.println(server ? "Server sends " + protocol : "Client sends " + protocol);
+        print(server ? "Server sends " + protocol : "Client sends " + protocol);
     }
 
     private void listenForHandshake(String protocol) throws InterruptedException {
@@ -34,7 +36,7 @@ public class TransportLayer {
             }
             String str = new String(byteArray);
             if (str.equals(protocol)) {
-                System.out.println(server ? "Server receives " + protocol: "Client receives " + protocol);
+                print(server ? "Server receives " + protocol: "Client receives " + protocol);
 
                 break;
             }
@@ -59,11 +61,12 @@ public class TransportLayer {
         if (!connectionOpen) {
             handShake();
         }
+        print("sending packet of size "+ payload.length +"bytes");
         networkLayer.send(payload);
         
         // if non-persistent, Close connection when client received the packet
         if (Config.HTTP_VERSION == 1.0 && server){
-            System.out.println("Server closes connection");
+            print("Server closes connection");
             connectionOpen = false;
         }
     }
@@ -73,12 +76,22 @@ public class TransportLayer {
             handShake();
         }
         byte[] payload = networkLayer.receive();
+        print("receiving packet of size "+ payload.length +"bytes");
         
         // if non-persistent, Close connection when client received the packet
         if (Config.HTTP_VERSION == 1.0 && !server){
-            System.out.println("Client closes connection");
+            print("Client closes connection");
             connectionOpen = false;
         }
         return payload;
+    }
+    
+    /**
+     * Method to print transport layer logs in a specific format
+     * 
+     * @param s string to print
+     */
+    public static void print(String s){
+        System.out.println(">>>>> [TL] "+s);
     }
 }
