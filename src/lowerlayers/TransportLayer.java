@@ -55,7 +55,7 @@ public class TransportLayer {
         return payload;
     }
 
-    private void closeConnection() {
+    public void closeConnection() {
         System.out.println(server ? "Server closes connection" : "Client closes connection");
         connectionOpen = false;
     }
