@@ -1,1 +1,7 @@
-Hi. I am child2.txt
+Hi. 
+I am child2.txt
+data data data data data data data data data
+data data data data data data data data data
+data data data data data data data data data
+data data data data data data data data data
+Bye.

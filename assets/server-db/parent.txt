@@ -1,7 +1,9 @@
-Hi. I am a single parent entity.
-I have two children. The first one is child1.txt. Say something:
+Hello. 
+I am parent.txt
+I have two children, child1.txt and child2.txt. 
+Here they are.
 <<school/child1.txt>>
-The second one is child2.txt. Say something:
 <<school/child2.txt>>
-They were in school but I called them out just to show you.
+data data data data data data data data data
 Have a nice day.
+Bye.
