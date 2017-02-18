@@ -1,5 +1,6 @@
 package applayer;
 
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
@@ -9,6 +10,8 @@ import java.util.LinkedHashMap;
  * @author hongha912
  */
 public class Packet {
+
+    public static final SimpleDateFormat HTTP_TIME_FORMAT = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
 
     protected HashMap<String, String> headings;
     protected double version;

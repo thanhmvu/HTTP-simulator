@@ -5,7 +5,6 @@
  */
 package applayer;
 
-import util.Config;
 import java.util.HashMap;
 import lowerlayers.TransportLayer;
 
@@ -14,11 +13,21 @@ import lowerlayers.TransportLayer;
  * @author thanhvu
  */
 public class LocalCache {
+    
+    /**
+     * Store a cache object
+     */
     class CachedObject{
         public String url;
         public String lastModifiedTime;
         public String content;
         
+        /**
+         * Create a cache object
+         * @param url
+         * @param lmt
+         * @param content 
+         */
         public CachedObject (String url, String lmt, String content){
             this.url = url;
             this.lastModifiedTime = lmt;
@@ -26,62 +35,38 @@ public class LocalCache {
         }
     }
     
-    private String cacheDir;
     private HashMap<String,CachedObject> caches;
     TransportLayer transportLayer;
     
+    /**
+     * Create a cache in the browser
+     */
     public LocalCache(){
-        cacheDir = "../../assets/local-cached-files/";
         caches = new HashMap<>();
         
-        boolean isServer = false;
-        transportLayer = new TransportLayer(isServer);
+
     }
     
-    public String requestAndReceive(RequestPacket reqPacket) throws InterruptedException{
-        request(reqPacket);   
-        String response = receive(reqPacket);
-        
-        return response;
+    public String getCachedLastModifiedTime(String url) {
+        return caches.get(url).lastModifiedTime;
     }
     
-    private void request(RequestPacket reqPacket) throws InterruptedException{
-        // check if object was cached before
-        CachedObject cachedObj = caches.get(reqPacket.getUrl());
-        if(cachedObj != null){
-            reqPacket.addHeading("If-modified-since", cachedObj.lastModifiedTime);
-            System.out.println("Found existing cache. Send conditional GET");
-        } else {
-            System.out.println("No existing cache found. Send normal GET");
-        }
-        
-        // convert request to byte array and send to transport layer
-        byte[] byteArray = reqPacket.toProtocol().getBytes();
-        transportLayer.send(byteArray);
+    public boolean existsInCache(String url) {
+        return caches.containsKey(url);
     }
     
-    private String receive(RequestPacket reqPacket) throws InterruptedException{
-        byte[] byteArray = transportLayer.receive();
-        String response = new String(byteArray);
-        ResponsePacket resPacket = new ResponsePacket(response);
-        
-        String requestedObj = null;
-        switch (resPacket.getStatusCode()) {
-            case 200: // OK
-                requestedObj = resPacket.getBody();
-                // cache the recieved object
-                CachedObject objToCache = new CachedObject(reqPacket.getUrl(), 
-                        resPacket.getValue("Last-Modified"), requestedObj);
-                caches.put(reqPacket.getUrl(), objToCache);
-                break;
-            case 304: // Not modified
-                CachedObject cachedObj = caches.get(reqPacket.getUrl());
-                requestedObj = cachedObj.content;
-                break;
-            case 404: // Not found
-                requestedObj = resPacket.getBody();
-        }
-        
-        return requestedObj;
+    public void cache(String url, String lmt, String content) {
+        caches.put(url, new CachedObject(url, lmt, content));
+    }
+    
+    public String getCachedContent(String url) {
+        return caches.get(url).content;
+    }
+    
+    /**
+     * Empty the cache
+     */
+    public void empty() {
+        caches.clear();
     }
 }

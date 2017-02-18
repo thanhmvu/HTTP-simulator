@@ -8,7 +8,6 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.text.ParseException;
 import lowerlayers.TransportLayer;
-import util.Config;
 
 /**
  * This application runs the server, find the file, send it back to the client
@@ -26,7 +25,7 @@ public class ServerApp {
      *
      */
     public ServerApp() {
-        transportLayer = new TransportLayer(true);
+        transportLayer = new TransportLayer(true, 0, 0);
 
     }
 
@@ -50,7 +49,8 @@ public class ServerApp {
             //get response
             ResponsePacket resPacket = respond(reqPacket);
             String response = resPacket.toProtocol();
-            transportLayer.send(response.getBytes());
+
+            transportLayer.send(response.getBytes(), reqPacket.getVersion());
 
         }
     }
@@ -88,9 +88,9 @@ public class ServerApp {
         //get cache modified time (if exist)
         Long cacheModifiedTime = null;
         String cacheModifiedTimeStr = reqPacket.getValue("If-modified-since");
-        if (cacheModifiedTimeStr != null) {           
+        if (cacheModifiedTimeStr != null) {
             try {
-                cacheModifiedTime = Config.HTTP_TIME_FORMAT.parse(cacheModifiedTimeStr).getTime();
+                cacheModifiedTime = Packet.HTTP_TIME_FORMAT.parse(cacheModifiedTimeStr).getTime();
             } catch (ParseException ex) {
             }
         }
@@ -105,16 +105,17 @@ public class ServerApp {
             //read file and send file
             encoded = Files.readAllBytes(path);
             String body = new String(encoded, StandardCharsets.UTF_8);
-            
+
             //create packet with last-modified
             ResponsePacket resPacket = new ResponsePacket(reqPacket.getVersion(), 200, "OK", body);
-            resPacket.addHeading("Last-Modified", Config.HTTP_TIME_FORMAT.format(fileModifiedTime.toMillis()));
+            resPacket.addHeading("Last-Modified", Packet.HTTP_TIME_FORMAT.format(fileModifiedTime.toMillis()));
             return resPacket;
         } catch (IOException ex) {
             //file not found
             return new ResponsePacket(reqPacket.getVersion(), 404, "Not Found", "");
         }
     }
+
 
     public static void main(String[] args) throws Exception {
         ServerApp server = new ServerApp();
