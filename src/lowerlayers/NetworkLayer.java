@@ -11,8 +11,6 @@ public class NetworkLayer {
      * Constructor with delay parameters
      *
      * @param server Whether the server is up
-     * @param propDelay Propagation delay (ms)
-     * @param transDelayPerByte Transmission delay (ms)
      */
     public NetworkLayer(boolean server) {
         linkLayer = new LinkLayer(server);

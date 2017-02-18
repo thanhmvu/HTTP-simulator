@@ -24,8 +24,6 @@ public class ServerApp {
     /**
      * Set up a server
      *
-     * @param propDelay
-     * @param transDelayPerByte
      */
     public ServerApp() {
         transportLayer = new TransportLayer(true);

@@ -87,15 +87,15 @@ public class TransportLayer {
     }
 
     private void serverHandshakes() throws InterruptedException {
-        this.sendHandshakeProtocol("SYN");
-        this.listenForHandshake("ACK");
-        connectionOpen = true;
-    }
-
-    private void clientHandshakes() throws InterruptedException {
         this.listenForHandshake("SYN");
         connectionOpen = true;
         this.sendHandshakeProtocol("ACK");
+    }
+
+    private void clientHandshakes() throws InterruptedException {
+        this.sendHandshakeProtocol("SYN");
+        this.listenForHandshake("ACK");
+        connectionOpen = true;
     }
 
     /**
