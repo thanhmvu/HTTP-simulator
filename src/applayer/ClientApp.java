@@ -8,6 +8,9 @@ import java.io.InputStreamReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 
 /**
  * This class represents a client application
@@ -115,7 +118,7 @@ public class ClientApp {
     /**
      * Experiment method that examines response time of the network simulation
      */
-    public void runExperiment(){
+    public void runSimulation(){
         String url = "parent.txt";
         print("requesting "+url+" ...");
         Document doc = request(url);
@@ -126,14 +129,26 @@ public class ClientApp {
      * Experiment method that runs the experiment for transport delay
      */
     public void runTransExp(){
-    
+        int initDelay = 10;
+        int n = 10;
+        int increment = 5;
+        for(int i =0; i< n; i++){
+            Config.TRANS_DELAY_PER_BYTE = initDelay + i*increment;
+            runSimulation();
+        }
     }
     
     /**
      * Experiment method that runs the experiment for propagation delay
      */
     public void runPropExp(){
-    
+        int initDelay = 1000;
+        int n = 10;
+        int increment = 500;
+        for(int i =0; i< n; i++){
+            Config.PROP_DELAY = initDelay + i*increment;
+            runSimulation();
+        }
     }
     
     /**
@@ -143,13 +158,25 @@ public class ClientApp {
     
     }
     
-    
+    public void runExperiment(String outputFile) throws FileNotFoundException{
+        PrintWriter pw = new PrintWriter(new File(outputFile));
+        StringBuilder sb = new StringBuilder();
+        sb.append("\n");
+
+        
+        
+        
+        pw.write(sb.toString());
+        pw.close();
+        System.out.println("done!");
+    }
     /** =============================== Main ============================= **/
     public static void main(String[] args) throws Exception {
         System.out.println();
         ClientApp client = new ClientApp();
         print("This is Client App:");
 //        client.run();
-        client.runExperiment();
+//        client.runExperiment("results.csv");
+        client.runSimulation();
     }
 }

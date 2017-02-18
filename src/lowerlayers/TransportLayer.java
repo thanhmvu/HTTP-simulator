@@ -18,6 +18,8 @@ public class TransportLayer {
      */
     public TransportLayer(boolean server, int propDelay, int transDelayPerByte) {
         networkLayer = new NetworkLayer(server, propDelay, transDelayPerByte);
+        print("trans prop: "+propDelay);
+        print("trans trans: "+transDelayPerByte);
         this.server = server;
         connectionOpen = false;
     }
@@ -85,7 +87,7 @@ public class TransportLayer {
      */
     private void sendHandshakeProtocol(String protocol) throws InterruptedException {
         networkLayer.send((protocol).getBytes());
-        System.out.println(server ? "Server sends " + protocol : "Client sends " + protocol);
+        print(server ? "Server sends " + protocol : "Client sends " + protocol);
     }
 
     /**
@@ -103,10 +105,21 @@ public class TransportLayer {
             }
             String str = new String(byteArray);
             if (str.equals(protocol)) {
-                System.out.println(server ? "Server receives " + protocol : "Client receives " + protocol);
+                print(server ? "Server receives " + protocol: "Client receives " + protocol);
+
                 break;
             }
         }
 
+    }
+    
+    
+    /**
+     * Method to print transport layer logs in a specific format
+     * 
+     * @param s string to print
+     */
+    public static void print(String s){
+        System.out.println(">>>>> [TL] "+s);
     }
 }
