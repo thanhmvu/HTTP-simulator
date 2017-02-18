@@ -13,13 +13,9 @@ public class TransportLayer {
      *
      * @param server server is true if the application is a server (should
      * listen) or false if it is a client (should try and connect)
-     * @param propDelay Propagation delay (ms)
-     * @param transDelayPerByte Transmission delay per second (ms)
      */
-    public TransportLayer(boolean server, int propDelay, int transDelayPerByte) {
-        networkLayer = new NetworkLayer(server, propDelay, transDelayPerByte);
-        print("trans prop: "+propDelay);
-        print("trans trans: "+transDelayPerByte);
+    public TransportLayer(boolean server) {
+        networkLayer = new NetworkLayer(server);
         this.server = server;
         connectionOpen = false;
     }
@@ -28,7 +24,7 @@ public class TransportLayer {
      * Send a payload
      *
      * @param payload The payload
-     * @throws InterruptedException
+     * @throws InterruptedException If the thread is disrupted
      */
     public void send(byte[] payload) throws InterruptedException {
         handShakeIfNoConnection();
@@ -36,24 +32,33 @@ public class TransportLayer {
             closeConnection();
             return;
         }
-        print("sending packet of size "+ payload.length +"bytes");
+        print("sending packet of size " + payload.length + "bytes");
         networkLayer.send(payload);
 
         // if non-persistent, Close connection when client received the packet
         if (Config.HTTP_VERSION == 1.0 && server) {
             closeConnection();
-        } 
-        
+        }
+
     }
 
+    /**
+     * Receive a payload from the outputstream
+     *
+     * @return a byte array that is the payload
+     * @throws InterruptedException If the thread is disrupted
+     */
     public byte[] receive() throws InterruptedException {
         handShakeIfNoConnection();
         byte[] payload = networkLayer.receive();
+
+        //handling null payload
         if (payload == null) {
             closeConnection();
             return null;
         }
-        print("receiving packet of size "+ payload.length +"bytes");
+
+        print("receiving packet of size " + payload.length + "bytes");
 
         // if non-persistent, Close connection when client received the packet
         if (Config.HTTP_VERSION == 1.0 && !server) {
@@ -62,11 +67,15 @@ public class TransportLayer {
         return payload;
     }
 
+    /**
+     * Close the connection established by transport layer
+     */
     private void closeConnection() {
         print(server ? "Server closes connection" : "Client closes connection");
         connectionOpen = false;
     }
 
+    //===========IMPLEMENTATION OF HANDSHAKES======================
     private void handShakeIfNoConnection() throws InterruptedException {
         if (!connectionOpen) {
             if (!server) {
@@ -75,7 +84,6 @@ public class TransportLayer {
                 serverHandshakes();
             }
         }
-
     }
 
     private void serverHandshakes() throws InterruptedException {
@@ -116,21 +124,21 @@ public class TransportLayer {
             }
             String str = new String(byteArray);
             if (str.equals(protocol)) {
-                print(server ? "Server receives " + protocol: "Client receives " + protocol);
+                print(server ? "Server receives " + protocol : "Client receives " + protocol);
 
                 break;
             }
         }
 
     }
-    
-    
+
+    //===================HELPER METHODS==================================
     /**
      * Method to print transport layer logs in a specific format
-     * 
+     *
      * @param s string to print
      */
-    public static void print(String s){
-        System.out.println(">>>>> [TL] "+s);
+    public static void print(String s) {
+        System.out.println(">>>>> [TL] " + s);
     }
 }

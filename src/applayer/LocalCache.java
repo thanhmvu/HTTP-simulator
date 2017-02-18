@@ -35,7 +35,7 @@ public class LocalCache {
         caches = new HashMap<>();
         
         boolean isServer = false;
-        transportLayer = new TransportLayer(isServer, Config.PROP_DELAY,Config.TRANS_DELAY_PER_BYTE);
+        transportLayer = new TransportLayer(isServer);
     }
     
     public String requestAndReceive(RequestPacket reqPacket) throws InterruptedException{

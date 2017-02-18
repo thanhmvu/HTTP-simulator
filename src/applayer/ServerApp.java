@@ -27,8 +27,8 @@ public class ServerApp {
      * @param propDelay
      * @param transDelayPerByte
      */
-    public ServerApp(int propDelay, int transDelayPerByte) {
-        transportLayer = new TransportLayer(true, propDelay, transDelayPerByte);
+    public ServerApp() {
+        transportLayer = new TransportLayer(true);
 
     }
 
@@ -119,7 +119,7 @@ public class ServerApp {
     }
 
     public static void main(String[] args) throws Exception {
-        ServerApp server = new ServerApp(100, 10);
+        ServerApp server = new ServerApp();
         System.out.println("The server is listenting ...");
         server.listen();
     }

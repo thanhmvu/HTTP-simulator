@@ -1,11 +1,11 @@
 package lowerlayers;
 
 import java.util.concurrent.TimeUnit;
+import util.Config;
 
 public class NetworkLayer {
 
     private LinkLayer linkLayer;
-    private int propDelay, transDelayPerByte;
 
     /**
      * Constructor with delay parameters
@@ -14,10 +14,8 @@ public class NetworkLayer {
      * @param propDelay Propagation delay (ms)
      * @param transDelayPerByte Transmission delay (ms)
      */
-    public NetworkLayer(boolean server, int propDelay, int transDelayPerByte) {
+    public NetworkLayer(boolean server) {
         linkLayer = new LinkLayer(server);
-        this.propDelay = propDelay;
-        this.transDelayPerByte = transDelayPerByte;
     }
 
     /**
@@ -50,8 +48,8 @@ public class NetworkLayer {
      */
     private void delay(byte[] payload) throws InterruptedException {
         if (payload != null) {
-            TimeUnit.MILLISECONDS.sleep(propDelay);
-            TimeUnit.MILLISECONDS.sleep(transDelayPerByte * payload.length);
+            TimeUnit.MILLISECONDS.sleep(Config.PROP_DELAY);
+            TimeUnit.MILLISECONDS.sleep(Config.TRANS_DELAY_PER_BYTE * payload.length);
         }
 
     }
