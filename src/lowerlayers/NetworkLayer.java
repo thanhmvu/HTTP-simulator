@@ -32,12 +32,22 @@ public class NetworkLayer {
         linkLayer.send(payload);
     }
 
+    /**
+     * Receive and return what is sent
+     * @return A payload
+     * @throws InterruptedException Exception that happens when thread is
+     * interrupted
+     */
     public byte[] receive() throws InterruptedException {
         byte[] payload = linkLayer.receive();
-        this.delay(payload);
         return payload;
     }
 
+    /**
+     * Delay the process
+     * @param payload
+     * @throws InterruptedException 
+     */
     private void delay(byte[] payload) throws InterruptedException {
         if (payload != null) {
             TimeUnit.MILLISECONDS.sleep(propDelay);
