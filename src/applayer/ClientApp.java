@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 /**
  * This class represents a client application
@@ -22,7 +23,6 @@ public class ClientApp {
     // TransportLayer transportLayer;
     LocalCache localCache;
     
-    /** ============================ Constructor ========================== **/
     /**
      * Default constructor to create client
      */
@@ -33,8 +33,6 @@ public class ClientApp {
         localCache = new LocalCache(); 
     }
     
-    
-    /** ============================== Methods ============================ **/
     /**
      * Request and retrieve a Document object of a file
      * 
@@ -44,11 +42,11 @@ public class ClientApp {
     public Document request(String url){
         Document doc = null;
         try {
-            long start = System.currentTimeMillis();
+//            long start = System.currentTimeMillis();
             RequestPacket reqPacket = new RequestPacket(Config.HTTP_VERSION,"GET",url);
             String content = localCache.requestAndReceive(reqPacket);
-            long end = System.currentTimeMillis();
-            print("Time to get "+ url +" : "+ (end-start) + " ms");
+//            long end = System.currentTimeMillis();
+//            print("Time to get "+ url +" : "+ (end-start) + " ms");
             
             // Convert content to Document
             doc = new Document(url,content);
@@ -70,7 +68,7 @@ public class ClientApp {
      * Method that runs the client application,
      * accepting input requests from users via standard input
      */
-    public void run(){
+    public void test(){
         try{
             //read in first line from keyboard
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -114,69 +112,30 @@ public class ClientApp {
         System.out.println(">>>>> [CA] "+s);
     }
     
-    /** ========================= Experiment Methods ======================= **/
     /**
      * Experiment method that examines response time of the network simulation
+     * 
+     * @return time to get the whole web page
      */
-    public void runSimulation(){
+    public long downloadWebpage(){
         String url = "parent.txt";
         print("requesting "+url+" ...");
+        
+        long start = System.currentTimeMillis();
         Document doc = request(url);
+        long end = System.currentTimeMillis();
+        long responseTime = (end-start);
+        print("Response time: "+ responseTime + " ms");
+        
         display(doc);
+        return responseTime;
     }
     
-    /**
-     * Experiment method that runs the experiment for transport delay
-     */
-    public void runTransExp(){
-        int initDelay = 10;
-        int n = 10;
-        int increment = 5;
-        for(int i =0; i< n; i++){
-            Config.TRANS_DELAY_PER_BYTE = initDelay + i*increment;
-            runSimulation();
-        }
-    }
-    
-    /**
-     * Experiment method that runs the experiment for propagation delay
-     */
-    public void runPropExp(){
-        int initDelay = 1000;
-        int n = 10;
-        int increment = 500;
-        for(int i =0; i< n; i++){
-            Config.PROP_DELAY = initDelay + i*increment;
-            runSimulation();
-        }
-    }
-    
-    /**
-     * Experiment method that runs the experiment for number of requested files
-     */
-    public void runFileNumExp(){
-    
-    }
-    
-    public void runExperiment(String outputFile) throws FileNotFoundException{
-        PrintWriter pw = new PrintWriter(new File(outputFile));
-        StringBuilder sb = new StringBuilder();
-        sb.append("\n");
-
-        
-        
-        
-        pw.write(sb.toString());
-        pw.close();
-        System.out.println("done!");
-    }
     /** =============================== Main ============================= **/
     public static void main(String[] args) throws Exception {
         System.out.println();
         ClientApp client = new ClientApp();
         print("This is Client App:");
-//        client.run();
-//        client.runExperiment("results.csv");
-        client.runSimulation();
+        client.downloadWebpage();
     }
 }
