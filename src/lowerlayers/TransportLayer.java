@@ -32,31 +32,38 @@ public class TransportLayer {
      */
     public void send(byte[] payload) throws InterruptedException {
         handShakeIfNoConnection();
+        if (payload == null) {
+            closeConnection();
+            return;
+        }
         print("sending packet of size "+ payload.length +"bytes");
         networkLayer.send(payload);
 
         // if non-persistent, Close connection when client received the packet
         if (Config.HTTP_VERSION == 1.0 && server) {
-            print("Server closes connection");
             closeConnection();
-        }
+        } 
+        
     }
 
     public byte[] receive() throws InterruptedException {
         handShakeIfNoConnection();
         byte[] payload = networkLayer.receive();
+        if (payload == null) {
+            closeConnection();
+            return null;
+        }
         print("receiving packet of size "+ payload.length +"bytes");
 
         // if non-persistent, Close connection when client received the packet
         if (Config.HTTP_VERSION == 1.0 && !server) {
-            print("receiving packet of size "+ payload.length +"bytes");
             closeConnection();
         }
         return payload;
     }
 
-    public void closeConnection() {
-        System.out.println(server ? "Server closes connection" : "Client closes connection");
+    private void closeConnection() {
+        print(server ? "Server closes connection" : "Client closes connection");
         connectionOpen = false;
     }
 

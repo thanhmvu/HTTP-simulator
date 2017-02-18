@@ -39,9 +39,10 @@ public class NetworkLayer {
     }
 
     private void delay(byte[] payload) throws InterruptedException {
-
-        TimeUnit.MILLISECONDS.sleep(propDelay);
-        TimeUnit.MILLISECONDS.sleep(transDelayPerByte * payload.length);
+        if (payload != null) {
+            TimeUnit.MILLISECONDS.sleep(propDelay);
+            TimeUnit.MILLISECONDS.sleep(transDelayPerByte * payload.length);
+        }
 
     }
 }
