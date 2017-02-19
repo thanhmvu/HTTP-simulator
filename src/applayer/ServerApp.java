@@ -94,23 +94,28 @@ public class ServerApp {
         String cacheMTime = reqPacket.getValue("If-modified-since");
 
         try {
+            ResponsePacket resPacket = null;
             //check for modified time
             String fileMTime = Packet.TIME_FORMAT.format(Files.getLastModifiedTime(path).toMillis());
             if (cacheMTime != null && fileMTime.compareTo(cacheMTime) == 0) {
-                return new ResponsePacket(reqPacket.getVersion(), 304, "Not Modified", "");
+                resPacket = new ResponsePacket(reqPacket.getVersion(), 304, "Not Modified", "");
+                resPacket.addHeading("URL",reqPacket.getUrl());
+            } else {
+                //read file and send file
+                encoded = Files.readAllBytes(path);
+                String body = new String(encoded, StandardCharsets.UTF_8);
+
+                //create packet with last-modified
+                resPacket = new ResponsePacket(reqPacket.getVersion(), 200, "OK", body);
+                resPacket.addHeading("Last-Modified", fileMTime);
+                resPacket.addHeading("URL",reqPacket.getUrl());
             }
-
-            //read file and send file
-            encoded = Files.readAllBytes(path);
-            String body = new String(encoded, StandardCharsets.UTF_8);
-
-            //create packet with last-modified
-            ResponsePacket resPacket = new ResponsePacket(reqPacket.getVersion(), 200, "OK", body);
-            resPacket.addHeading("Last-Modified", fileMTime);
             return resPacket;
         } catch (IOException ex) {
             //file not found
-            return new ResponsePacket(reqPacket.getVersion(), 404, "Not Found", "");
+            ResponsePacket resPacket = new ResponsePacket(reqPacket.getVersion(), 404, "Not Found", "");
+            resPacket.addHeading("URL",reqPacket.getUrl());
+            return resPacket;
         }
     }
 
