@@ -41,7 +41,7 @@ public class Packet {
      * @param heading Add a heading
      * @param value Add a value
      */
-    protected void addHeading(String heading, String value) {
+    public void addHeading(String heading, String value) {
         headings.put(heading, value);
     }
 
@@ -50,7 +50,7 @@ public class Packet {
      *
      * @param headings an existing heading-value map
      */
-    protected void addHeadings(HashMap<String, String> headings) {
+    public void addHeadings(HashMap<String, String> headings) {
         if(headings != null) this.headings.putAll(headings);
     }
 

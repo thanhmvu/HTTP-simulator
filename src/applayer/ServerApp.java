@@ -47,8 +47,16 @@ public class ServerApp {
             //get response
             ResponsePacket resPacket = respond(reqPacket);
             String response = resPacket.toProtocol();
-
-            transportLayer.sendForServer(response.getBytes(), reqPacket.getVersion());
+            
+            if(reqPacket.getVersion() == 1.2){
+                //get HTTP 1.2 header
+                boolean closeAfterThis = 
+                        reqPacket.getValue("Close-after-this").equals("true");
+                transportLayer.sendMultiForServer(response.getBytes(), 
+                        reqPacket.getVersion(), closeAfterThis);
+            } else {
+                transportLayer.sendForServer(response.getBytes(), reqPacket.getVersion());
+            }
 
         }
     }

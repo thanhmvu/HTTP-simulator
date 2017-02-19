@@ -84,7 +84,13 @@ public class TransportLayer {
     public void sendMultiForClient(ArrayList<RequestPacket> reqPackets, double httpVersion) 
             throws InterruptedException {
         if(!server && httpVersion == 1.2){
-            for(RequestPacket reqPacket: reqPackets){
+            for(int i = 0; i< reqPackets.size(); i++){
+                RequestPacket reqPacket = reqPackets.get(i);
+                
+                // add heading to notice server to close after the last packet
+                String value = "" + (i == reqPackets.size()-1);
+                reqPacket.addHeading("Close-after-this",value);
+
                 handShakeIfNoConnection();
                 
                 byte[] payload = reqPacket.toProtocol().getBytes();
@@ -124,11 +130,11 @@ public class TransportLayer {
      * Send a payload
      *
      * @param payload The payload
-     * @param httpVersion HTTP version 1.0, 1.1, 1.2
+     * @param httpVersion HTTP version 1.0, 1.1
      * @throws InterruptedException If the thread is disrupted
      */
     public void sendForServer(byte[] payload, double httpVersion) throws InterruptedException {
-        if(server){
+        if(server && (httpVersion == 1.0 || httpVersion == 1.1)){
             handShakeIfNoConnection();
             if (payload == null) {
                 closeConnection();
@@ -141,7 +147,33 @@ public class TransportLayer {
                 closeConnection();
             }
         } else {
-            print("ERROR: Not a server");
+            print("ERROR: Not a server or not HTTP 1.0 or 1.1");
+        }
+    }
+    
+    /**
+     * Send a payload with HTTP 1.2
+     *
+     * @param payload The payload
+     * @param httpVersion only accept HTTP version 1.2
+     * @throws InterruptedException If the thread is disrupted
+     */
+    public void sendMultiForServer(byte[] payload, double httpVersion, boolean closeAfterThis) 
+            throws InterruptedException {
+        if(server && httpVersion == 1.2){
+            handShakeIfNoConnection();
+            if (payload == null) {
+                closeConnection();
+                return;
+            }
+            print("sending packet of size " + payload.length + "bytes");
+            networkLayer.send(payload);
+            // close if this is the last packet server needs to send
+            if (closeAfterThis) {
+                closeConnection();
+            }
+        } else {
+            print("ERROR: Not a server or not HTTP 1.2");
         }
     }
 
