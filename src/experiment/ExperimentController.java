@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package applayer;
+package experiment;
 
+import applayer.ClientApp;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
