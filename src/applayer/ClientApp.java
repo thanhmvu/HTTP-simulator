@@ -58,7 +58,7 @@ public class ClientApp {
         display(doc);
         return responseTime;
     }
-    
+
     /**
      * Experiment method that retrieves and displays a web page
      *
@@ -66,11 +66,11 @@ public class ClientApp {
      */
     public long downloadWebPages(ArrayList<String> urls) {
         long start = System.currentTimeMillis();
-        if(!urls.isEmpty()){
-            if(this.httpVersion == 1.2){
+        if (!urls.isEmpty()) {
+            if (this.httpVersion == 1.2) {
                 print("Version 1.2. Downloading a list of web pages ...");
                 ArrayList<Document> docs = retrieveMultiWebPage(urls);
-                for(Document doc: docs){
+                for (Document doc : docs) {
                     display(doc);
                 }
             } else {
@@ -86,7 +86,9 @@ public class ClientApp {
         return responseTime;
     }
 
-    /** ======================= MULTI REQUEST & RECEIVE ======================== **/
+    /**
+     * ======================= MULTI REQUEST & RECEIVE ======================== *
+     */
     /**
      * Request and retrieve multiple web pages
      *
@@ -98,17 +100,17 @@ public class ClientApp {
         try {
             // create a list of requests
             ArrayList<RequestPacket> reqPackets = new ArrayList<>();
-            for(String url: urls){
+            for (String url : urls) {
                 RequestPacket reqPacket = new RequestPacket(httpVersion, "GET", url);
                 reqPackets.add(reqPacket);
             }
-            
+
             // request and receive
             requestMulti(reqPackets);
-            HashMap<String,String> pages = receiveMulti(reqPackets); // <url, content>
+            HashMap<String, String> pages = receiveMulti(reqPackets); // <url, content>
 
             // recursively create Doc and retrieve embedded files
-            for(String url: pages.keySet()){
+            for (String url : pages.keySet()) {
                 // Convert text to Document
                 Document doc = new Document(url, pages.get(url));
                 ArrayList<Document> embdDocs = this.retrieveMultiWebPage(doc.getEmbdUrls());
@@ -120,14 +122,13 @@ public class ClientApp {
         }
         return docs;
     }
-    
-    private void requestMulti(ArrayList<RequestPacket> reqPackets) 
-            throws InterruptedException 
-    {
+
+    private void requestMulti(ArrayList<RequestPacket> reqPackets)
+            throws InterruptedException {
         // check if object was cached before
-        for(RequestPacket reqPacket: reqPackets){
+        for (RequestPacket reqPacket : reqPackets) {
             if (localCache.existsInCache(reqPacket.getUrl())) {
-                reqPacket.addHeading("If-modified-since", 
+                reqPacket.addHeading("If-modified-since",
                         localCache.getCachedLastModifiedTime(reqPacket.getUrl()));
                 System.out.println("Found existing cache. Send conditional GET");
             } else {
@@ -137,14 +138,13 @@ public class ClientApp {
         transportLayer.sendMultiForClient(reqPackets, httpVersion);
     }
 
-    private HashMap<String,String> receiveMulti(ArrayList<RequestPacket> reqPackets) 
-            throws InterruptedException 
-    {
+    private HashMap<String, String> receiveMulti(ArrayList<RequestPacket> reqPackets)
+            throws InterruptedException {
         byte[] byteArray = transportLayer.receiveForClient(httpVersion);
         String response = new String(byteArray);
         ResponsePacket resPacket = new ResponsePacket(response);
 
-        HashMap<String,String> requestedObj = null;
+        HashMap<String, String> requestedObj = null;
 //        switch (resPacket.getStatusCode()) {
 //            case 200: // OK
 //                requestedObj = resPacket.getBody();
@@ -163,8 +163,10 @@ public class ClientApp {
 
         return requestedObj;
     }
-    
-    /** ======================= REQUEST & RECEIVE ======================== **/
+
+    /**
+     * ======================= REQUEST & RECEIVE ======================== *
+     */
     /**
      * Request and retrieve a web page
      *
@@ -175,12 +177,12 @@ public class ClientApp {
         Document doc = null;
         try {
             RequestPacket reqPacket = new RequestPacket(httpVersion, "GET", url);
-            
+
             long start = System.currentTimeMillis();
             request(reqPacket);
             String content = receive(reqPacket);
             long end = System.currentTimeMillis();
-            print("Time to get "+ url+ ": " + (end-start) + " ms");
+            print("Time to get " + url + ": " + (end - start) + " ms");
 
             // Convert content to Document
             doc = new Document(url, content);
@@ -202,7 +204,7 @@ public class ClientApp {
 //        long start = System.currentTimeMillis();
         // check if object was cached before
         if (localCache.existsInCache(reqPacket.getUrl())) {
-            reqPacket.addHeading("If-modified-since", 
+            reqPacket.addHeading("If-modified-since",
                     localCache.getCachedLastModifiedTime(reqPacket.getUrl()));
             System.out.println("Found existing cache. Send conditional GET");
         } else {
@@ -218,7 +220,7 @@ public class ClientApp {
 
     private String receive(RequestPacket reqPacket) throws InterruptedException {
         byte[] byteArray = transportLayer.receiveForClient(httpVersion);
-        
+
 //        long start = System.currentTimeMillis();
         String response = new String(byteArray);
         ResponsePacket resPacket = new ResponsePacket(response);
@@ -244,20 +246,22 @@ public class ClientApp {
 
         return requestedObj;
     }
-    
-    /** ============================ SETTERS ============================= **/
+
+    /**
+     * ============================ SETTERS ============================= *
+     */
     public void setPropDelay(long propDelay) {
         transportLayer.setPropDelay(propDelay);
     }
-    
+
     public void setTransDelayPerByte(long transDelayPerByte) {
         transportLayer.setTransDelayPerByte(transDelayPerByte);
     }
-    
+
     public void setHttpVersion(double version) {
         this.httpVersion = version;
     }
-    
+
     /**
      * Reset to how it was constructed
      */
@@ -267,17 +271,19 @@ public class ClientApp {
         this.setHttpVersion(initHttpVersion);
         localCache.empty();
     }
-    
-    /** ============================= HELPERS ============================ **/
+
+    /**
+     * ============================= HELPERS ============================ *
+     */
     /**
      * Method to display a document
-     * 
+     *
      * @param doc the document object to display
      */
     private void display(Document doc) {
         print("Server responses: \n" + doc.getFullText());
     }
-    
+
     /**
      * Method to print client logs in a specific format
      *
@@ -288,8 +294,8 @@ public class ClientApp {
     }
 
     /**
-     * Method that runs the client application, 
-     * accepting input requests from users via standard input
+     * Method that runs the client application, accepting input requests from
+     * users via standard input
      */
     public void test() {
         try {

@@ -11,7 +11,7 @@ import java.util.LinkedHashMap;
  */
 public class Packet {
 
-    public static final SimpleDateFormat HTTP_TIME_FORMAT = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
+    public static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
 
     protected HashMap<String, String> headings;
     protected double version;

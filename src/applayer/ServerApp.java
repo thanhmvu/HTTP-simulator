@@ -7,6 +7,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.text.ParseException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 import lowerlayers.TransportLayer;
 
 /**
@@ -86,19 +91,12 @@ public class ServerApp {
         byte[] encoded;
 
         //get cache modified time (if exist)
-        Long cacheModifiedTime = null;
-        String cacheModifiedTimeStr = reqPacket.getValue("If-modified-since");
-        if (cacheModifiedTimeStr != null) {
-            try {
-                cacheModifiedTime = Packet.HTTP_TIME_FORMAT.parse(cacheModifiedTimeStr).getTime();
-            } catch (ParseException ex) {
-            }
-        }
+        String cacheMTime = reqPacket.getValue("If-modified-since");
 
         try {
             //check for modified time
-            FileTime fileModifiedTime = Files.getLastModifiedTime(path);
-            if (cacheModifiedTime != null && fileModifiedTime.toMillis() == cacheModifiedTime) {
+            String fileMTime = Packet.TIME_FORMAT.format(Files.getLastModifiedTime(path).toMillis());
+            if (cacheMTime != null && fileMTime.compareTo(cacheMTime) == 0) {
                 return new ResponsePacket(reqPacket.getVersion(), 304, "Not Modified", "");
             }
 
@@ -108,14 +106,13 @@ public class ServerApp {
 
             //create packet with last-modified
             ResponsePacket resPacket = new ResponsePacket(reqPacket.getVersion(), 200, "OK", body);
-            resPacket.addHeading("Last-Modified", Packet.HTTP_TIME_FORMAT.format(fileModifiedTime.toMillis()));
+            resPacket.addHeading("Last-Modified", fileMTime);
             return resPacket;
         } catch (IOException ex) {
             //file not found
             return new ResponsePacket(reqPacket.getVersion(), 404, "Not Found", "");
         }
     }
-
 
     public static void main(String[] args) throws Exception {
         ServerApp server = new ServerApp();
