@@ -3,6 +3,8 @@ package applayer;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -44,8 +46,7 @@ public class ClientApp {
      *
      * @return time to get the whole web page
      */
-    public long downloadWebpage() {
-        String url = "parent.txt";
+    public long downloadWebPage(String url) {
         print("requesting " + url + " ...");
 
         long start = System.currentTimeMillis();
@@ -58,9 +59,82 @@ public class ClientApp {
         return responseTime;
     }
 
+    /** ======================= MULTI REQUEST & RECEIVE ======================== **/
+    /**
+     * Request and retrieve multiple web pages
+     *
+     * @param url The URL of the file
+     * @return The document representing the file
+     */
+    private ArrayList<Document> retrieveMultiWebPage(ArrayList<String> urls) {
+        ArrayList<Document> docs = new ArrayList<>();
+        try {
+            // create a list of requests
+            ArrayList<RequestPacket> reqPackets = new ArrayList<>();
+            for(String url: urls){
+                RequestPacket reqPacket = new RequestPacket(httpVersion, "GET", url);
+                reqPackets.add(reqPacket);
+            }
+            
+            // request and receive
+            requestMulti(reqPackets);
+            HashMap<String,String> pages = receiveMulti(reqPackets); // <url, content>
+
+            // recursively retrieve embedded files
+            for(String url: pages.keySet()){
+                // Convert text to Document
+                Document doc = new Document(url, pages.get(url));
+                ArrayList<Document> embdDocs = this.retrieveMultiWebPage(doc.getEmbdUrls());
+                doc.addEmbdDocs(embdDocs);
+                docs.add(doc);
+            }
+        } catch (InterruptedException ex) {
+            Logger.getLogger(ClientApp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return docs;
+    }
+    private void requestMulti(ArrayList<RequestPacket> reqPackets) throws InterruptedException {
+        // check if object was cached before
+//        if (localCache.existsInCache(reqPacket.getUrl())) {
+//            reqPacket.addHeading("If-modified-since", localCache.getCachedLastModifiedTime(reqPacket.getUrl()));
+//            System.out.println("Found existing cache. Send conditional GET");
+//        } else {
+//            System.out.println("No existing cache found. Send normal GET");
+//        }
+//
+//        // convert request to byte array and send to transport layer
+//        byte[] byteArray = reqPacket.toProtocol().getBytes();
+//        transportLayer.send(byteArray, httpVersion);
+    }
+
+    private HashMap<String,String> receiveMulti(ArrayList<RequestPacket> reqPackets) throws InterruptedException {
+        byte[] byteArray = transportLayer.receiveForClient(httpVersion);
+        String response = new String(byteArray);
+        ResponsePacket resPacket = new ResponsePacket(response);
+
+         HashMap<String,String> requestedObj = null;
+//        switch (resPacket.getStatusCode()) {
+//            case 200: // OK
+//                requestedObj = resPacket.getBody();
+//                // cache the recieved object
+//                localCache.cache(reqPacket.getUrl(),
+//                        resPacket.getValue("Last-Modified"),
+//                        requestedObj);
+//                break;
+//            case 304: // Not modified
+//                requestedObj = localCache.getCachedContent(reqPacket.getUrl());
+//                break;
+//            case 404: // Not found
+//                requestedObj = resPacket.getBody();
+//                break;
+//        }
+
+        return requestedObj;
+    }
+    
     /** ======================= REQUEST & RECEIVE ======================== **/
     /**
-     * Request and retrieve a Document object of a file
+     * Request and retrieve a web page
      *
      * @param url The URL of the file
      * @return The document representing the file
@@ -205,10 +279,10 @@ public class ClientApp {
         System.out.println();
         ClientApp client = new ClientApp(1.0, 50, 5);
         print("This is Client App:");
-        client.downloadWebpage();
+        client.downloadWebPage("parent.txt");
 
         client.reset();
         client.setPropDelay(100);
-        client.downloadWebpage();
+        client.downloadWebPage("parent.txt");
     }
 }
