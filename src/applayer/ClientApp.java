@@ -58,6 +58,33 @@ public class ClientApp {
         display(doc);
         return responseTime;
     }
+    
+    /**
+     * Experiment method that retrieves and displays a web page
+     *
+     * @return time to get the whole web page
+     */
+    public long downloadWebPages(ArrayList<String> urls) {
+        long start = System.currentTimeMillis();
+        if(!urls.isEmpty()){
+            if(this.httpVersion == 1.2){
+                print("Version 1.2. Downloading a list of web pages ...");
+                ArrayList<Document> docs = retrieveMultiWebPage(urls);
+                for(Document doc: docs){
+                    display(doc);
+                }
+            } else {
+                print("Version " + this.httpVersion + ". Downloading first web page in the list ...");
+                print("requesting " + urls.get(0) + " ...");
+                Document doc = retrieveWebPage(urls.get(0));
+                display(doc);
+            }
+        }
+        long end = System.currentTimeMillis();
+        long responseTime = (end - start);
+        print("Total response time: " + responseTime + " ms");
+        return responseTime;
+    }
 
     /** ======================= MULTI REQUEST & RECEIVE ======================== **/
     /**
@@ -296,7 +323,9 @@ public class ClientApp {
         System.out.println();
         ClientApp client = new ClientApp(1.0, 1000, 10);
         print("This is Client App:");
-        client.downloadWebPage("pA2.txt");
+        ArrayList<String> urls = new ArrayList<>();
+        urls.add("pA2.txt");
+        client.downloadWebPages(urls);
 //
 //        client.reset();
 //        client.setPropDelay(100);

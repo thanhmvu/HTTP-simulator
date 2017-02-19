@@ -228,7 +228,11 @@ public class ExperimentController {
     }
 
     private long downloadWebPages(String url1, String url2) {
-        return client.downloadWebPage(url1) + client.downloadWebPage(url2);
+        ArrayList<String> urls1 = new ArrayList<>();
+        urls1.add(url1);
+        ArrayList<String> urls2 = new ArrayList<>();
+        urls2.add(url2);
+        return client.downloadWebPages(urls1) + client.downloadWebPages(urls2);
     }
 
     /**
