@@ -82,16 +82,16 @@ public class ExperimentController {
      */
     public void checkCorrectness(String outputFile) {
 
-        long propDelay = 400;
-        long transDelayPerByte = 3;
+        long propDelay = 200;
+        long transDelayPerByte = 2;
         int numTrials = 3;
         ExperimentResults nonPersCache = this.checkCorrectnessForVer(1.0, propDelay, transDelayPerByte, true, numTrials);
         ExperimentResults pers = this.checkCorrectnessForVer(1.1, propDelay, transDelayPerByte, false, numTrials);
-        // ExperimentResults mul = this.checkCorrectnessForVer(1.2, propDelay, transDelayPerByte, false, numTrials);
+        ExperimentResults mul = this.checkCorrectnessForVer(1.2, propDelay, transDelayPerByte, false, numTrials);
 
         String finalResult = nonPersCache.toCsvString()
-                + pers.toCsvString() //+ mul.toCsvString()
-                ;
+                + pers.toCsvString() 
+                + mul.toCsvString();
         try {
             this.printToFile(outputFile, finalResult);
         } catch (IOException ex) {
