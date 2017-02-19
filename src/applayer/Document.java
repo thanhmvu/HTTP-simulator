@@ -13,7 +13,7 @@ public class Document {
     String content;
     String OPEN = "<<";
     String CLOSE = ">>";
-    HashMap<String,Document> embdDocs;
+    HashMap<String,Document> embdDocs; // <url, doc>
     
     /**
      * Create a document with only URL (content unavailable)
@@ -73,6 +73,13 @@ public class Document {
         return new ArrayList<>(embdDocs.values());
     }
     
+    public ArrayList<String> getEmbdUrls(){
+        if(embdDocs.isEmpty()){
+            this.findEmbdFiles();
+        }
+        return new ArrayList<>(embdDocs.keySet());
+    }
+    
     /**
      * Get the full text of the document, including embedded docs
      * @return The full text of the document, including embedded docs
@@ -102,6 +109,12 @@ public class Document {
     
     public void addEmbdDoc(String embdFile, Document doc){
         embdDocs.put(embdFile, doc);
+    }
+    
+    public void addEmbdDocs(ArrayList<Document> docs){
+        for(Document doc: docs){
+            embdDocs.put(doc.getUrl(), doc);
+        }
     }
     
     public String getEmbdContent(String embdFile){
