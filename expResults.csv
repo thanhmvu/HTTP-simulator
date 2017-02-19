@@ -1,0 +1,13 @@
+Number of Objects vs. Response Time
+HTTP Version,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0
+Number of parent objects,2,2,2,2,2,2,2,2,2,2
+Number of children per parent,0,1,2,3,4,5,6,7,8,9
+Total number of objects,2,4,6,8,10,12,14,16,18,20
+Uncached Response Time,2045,6116,12257,20473,30758,43105,57513,73985,92516,113124
+Number of Objects vs. Response Time
+HTTP Version,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1
+Number of parent objects,2,2,2,2,2,2,2,2,2,2
+Number of children per parent,0,1,2,3,4,5,6,7,8,9
+Total number of objects,2,4,6,8,10,12,14,16,18,20
+Uncached Response Time,1646,4855,9713,16209,24351,34141,45559,58613,73305,89640
+

@@ -110,45 +110,51 @@ public class ExperimentController {
     public void runExperiment(String outputFile) throws FileNotFoundException {
         int runs = 10;
         int trialsPerRun = 3;
+        String finalResult = "";
+        int initDelay, increment;
         // ================ Transmission Delay ================ //
-        int initDelay = 2;
-        int increment = 3;
-        // Non-Persistent + Cached
-        ExperimentResults nonPersTransResults = this.runTransExp(initDelay, runs, increment, trialsPerRun, 1.0, true);
-        // Persistent
-        ExperimentResults persTransResults = this.runTransExp(initDelay, runs, increment, trialsPerRun, 1.1, false);
-        // Multiplex
-        ExperimentResults mulTransResults = this.runTransExp(initDelay, runs, increment, trialsPerRun, 1.2, false);
+//        int initDelay = 2;
+//        int increment = 3;
+//        // Non-Persistent + Cached
+//        ExperimentResults nonPersTransResults = this.runTransExp(initDelay, runs, increment, trialsPerRun, 1.0, true);
+//        // Persistent
+//        ExperimentResults persTransResults = this.runTransExp(initDelay, runs, increment, trialsPerRun, 1.1, false);
+//        // Multiplex
+//        ExperimentResults mulTransResults = this.runTransExp(initDelay, runs, increment, trialsPerRun, 1.2, false);
+//
+//        finalResult += nonPersTransResults.toCsvString()
+//                + persTransResults.toCsvString()
+//                + mulTransResults.toCsvString();
 
         // ================ Propagation Delay ================ //
-        initDelay = 100;
-        increment = 20;
-
-        // Non-Persistent
-        ExperimentResults nonPersPropResults = this.runPropExp(initDelay, runs, increment, trialsPerRun, 1.0);
-        // Persistent
-        ExperimentResults persPropResults = this.runPropExp(initDelay, runs, increment, trialsPerRun, 1.1);
-        // Multiplex
-        ExperimentResults mulPropResults = this.runPropExp(initDelay, runs, increment, trialsPerRun, 1.2);
+//        initDelay = 100;
+//        increment = 20;
+//
+//        // Non-Persistent
+//        ExperimentResults nonPersPropResults = this.runPropExp(initDelay, runs, increment, trialsPerRun, 1.0);
+//        // Persistent
+//        ExperimentResults persPropResults = this.runPropExp(initDelay, runs, increment, trialsPerRun, 1.1);
+//        // Multiplex
+//        ExperimentResults mulPropResults = this.runPropExp(initDelay, runs, increment, trialsPerRun, 1.2);
+//
+//        finalResult += nonPersPropResults.toCsvString()
+//                + persPropResults.toCsvString()
+//                + mulPropResults.toCsvString();
 
         // ================ Object Number ================ //
-        // Non-Persistent
-        ExperimentResults nonPersObjsResults = this.runObjNumberExp(runs, trialsPerRun, 1.0);
-        // Persistent
-        ExperimentResults persObjsResults = this.runObjNumberExp(runs, trialsPerRun, 1.1);
+//        // Non-Persistent
+//        ExperimentResults nonPersObjsResults = this.runObjNumberExp(runs, trialsPerRun, 1.0);
+//        // Persistent
+//        ExperimentResults persObjsResults = this.runObjNumberExp(runs, trialsPerRun, 1.1);
         // Multiplex
         ExperimentResults mulObjsResults = this.runObjNumberExp(runs, trialsPerRun, 1.2);
 
+        finalResult += 
+//                nonPersObjsResults.toCsvString()
+//                + persObjsResults.toCsvString() +
+                mulObjsResults.toCsvString()
+                ;
         // ================ Print To File ================ //
-        String finalResult = nonPersTransResults.toCsvString()
-                + persTransResults.toCsvString()
-                + mulTransResults.toCsvString()
-                + nonPersPropResults.toCsvString()
-                + persPropResults.toCsvString()
-                + mulPropResults.toCsvString()
-                + nonPersObjsResults.toCsvString()
-                + persObjsResults.toCsvString()
-                + mulObjsResults.toCsvString();
         try {
             this.printToFile(outputFile, finalResult);
         } catch (IOException ex) {
@@ -320,7 +326,7 @@ public class ExperimentController {
             for (String colName : cols.keySet()) {
                 result.append(colName);
                 for (String val : cols.get(colName)) {
-                    result.append(";").append(val);
+                    result.append(",").append(val);
                 }
                 result.append("\n");
             }
