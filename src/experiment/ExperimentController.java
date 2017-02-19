@@ -27,51 +27,15 @@ public class ExperimentController {
 
     private ClientApp client;
 
-    /**
-     * This class holds all the experiment results
-     */
-    private class ExperimentResults {
-
-        private String nameOfExperiment;
-        private HashMap<String, List<String>> cols;
-
-        ExperimentResults(String nameOfExp) {
-            System.out.println("Start experiment " + nameOfExp);
-            nameOfExperiment = nameOfExp;
-            cols = new LinkedHashMap<>();
-        }
-
-        void add(String colName, String colValue) {
-            List<String> col = cols.get(colName);
-            if (col == null) {
-                col = new ArrayList<>();
-                cols.put(colName, col);
-            }
-            col.add(colValue);
-        }
-
-        /**
-         * Convert Experiment Results into a CSV String
-         *
-         * @return a CSV String
-         */
-        String toCsvString() {
-            StringBuilder result = new StringBuilder();
-            result.append(nameOfExperiment).append("\n");
-            for (String colName : cols.keySet()) {
-                result.append(colName);
-                for (String val : cols.get(colName)) {
-                    result.append(";").append(val);
-                }
-                result.append("\n");
-            }
-            return result.toString();
-        }
-
-    }
-
     public ExperimentController() {
         client = new ClientApp(1.0, 100, 2);
+    }
+
+//=============================== MAIN ============================= 
+    public static void main(String[] args) throws Exception {
+        ExperimentController ec = new ExperimentController();
+        //ec.checkCorrectness("correctness.csv");
+        ec.runExperiment("expResults.csv");
     }
 
 //================CORRECTNESS CHECKING=======================================
@@ -90,7 +54,7 @@ public class ExperimentController {
         ExperimentResults mul = this.checkCorrectnessForVer(1.2, propDelay, transDelayPerByte, false, numTrials);
 
         String finalResult = nonPersCache.toCsvString()
-                + pers.toCsvString() 
+                + pers.toCsvString()
                 + mul.toCsvString();
         try {
             this.printToFile(outputFile, finalResult);
@@ -144,49 +108,47 @@ public class ExperimentController {
      * @throws FileNotFoundException
      */
     public void runExperiment(String outputFile) throws FileNotFoundException {
-
+        int runs = 10;
+        int trialsPerRun = 3;
         // ================ Transmission Delay ================ //
         int initDelay = 2;
-        int runs = 2;
         int increment = 3;
-        int trialPerRun = 2;
-
         // Non-Persistent + Cached
-        ExperimentResults nonPersTransResults = this.runTransExp(initDelay, runs, increment, trialPerRun, 1.0, true);
+        ExperimentResults nonPersTransResults = this.runTransExp(initDelay, runs, increment, trialsPerRun, 1.0, true);
         // Persistent
-        ExperimentResults persTransResults = this.runTransExp(initDelay, runs, increment, trialPerRun, 1.1, false);
+        ExperimentResults persTransResults = this.runTransExp(initDelay, runs, increment, trialsPerRun, 1.1, false);
         // Multiplex
-        //ExperimentResults mulTransResults = this.runTransExp(initDelay, runs, increment, trialPerRun, 1.2, false);
+        ExperimentResults mulTransResults = this.runTransExp(initDelay, runs, increment, trialsPerRun, 1.2, false);
 
         // ================ Propagation Delay ================ //
         initDelay = 100;
         increment = 20;
 
         // Non-Persistent
-        ExperimentResults nonPersPropResults = this.runPropExp(initDelay, runs, increment, trialPerRun, 1.0);
+        ExperimentResults nonPersPropResults = this.runPropExp(initDelay, runs, increment, trialsPerRun, 1.0);
         // Persistent
-        ExperimentResults persPropResults = this.runPropExp(initDelay, runs, increment, trialPerRun, 1.1);
+        ExperimentResults persPropResults = this.runPropExp(initDelay, runs, increment, trialsPerRun, 1.1);
         // Multiplex
-        //ExperimentResults mulPropResults = this.runPropExp(initDelay, runs, increment, trialPerRun, 1.2);
+        ExperimentResults mulPropResults = this.runPropExp(initDelay, runs, increment, trialsPerRun, 1.2);
 
         // ================ Object Number ================ //
         // Non-Persistent
-        ExperimentResults nonPersObjsResults = this.runObjNumberExp(runs, trialPerRun, 1.0);
+        ExperimentResults nonPersObjsResults = this.runObjNumberExp(runs, trialsPerRun, 1.0);
         // Persistent
-        ExperimentResults persObjsResults = this.runObjNumberExp(runs, trialPerRun, 1.1);
+        ExperimentResults persObjsResults = this.runObjNumberExp(runs, trialsPerRun, 1.1);
         // Multiplex
-        //ExperimentResults mulObjsResults = this.runObjNumberExp(runs, trialPerRun, 1.2);
+        ExperimentResults mulObjsResults = this.runObjNumberExp(runs, trialsPerRun, 1.2);
 
         // ================ Print To File ================ //
         String finalResult = nonPersTransResults.toCsvString()
                 + persTransResults.toCsvString()
-                //+ mulTransResults.toCsvString()
+                + mulTransResults.toCsvString()
                 + nonPersPropResults.toCsvString()
                 + persPropResults.toCsvString()
-                //+ mulPropResults.toCsvString()
+                + mulPropResults.toCsvString()
                 + nonPersObjsResults.toCsvString()
-                + persObjsResults.toCsvString() //+ mulObjsResults.toCsvString()
-                ;
+                + persObjsResults.toCsvString()
+                + mulObjsResults.toCsvString();
         try {
             this.printToFile(outputFile, finalResult);
         } catch (IOException ex) {
@@ -294,6 +256,7 @@ public class ExperimentController {
         return results;
 
     }
+//==================HELPERS=====================================
 
     /**
      * Download webpages that have the same number of children
@@ -324,11 +287,46 @@ public class ExperimentController {
     }
 
     /**
-     * =============================== Main ============================= *
+     * This class holds all the experiment results
      */
-    public static void main(String[] args) throws Exception {
-        ExperimentController ec = new ExperimentController();
-        ec.checkCorrectness("correctness.csv");
-        // ec.runExperiment("expResults.csv");
+    private class ExperimentResults {
+
+        private String nameOfExperiment;
+        private HashMap<String, List<String>> cols;
+
+        ExperimentResults(String nameOfExp) {
+            System.out.println("Start experiment " + nameOfExp);
+            nameOfExperiment = nameOfExp;
+            cols = new LinkedHashMap<>();
+        }
+
+        void add(String colName, String colValue) {
+            List<String> col = cols.get(colName);
+            if (col == null) {
+                col = new ArrayList<>();
+                cols.put(colName, col);
+            }
+            col.add(colValue);
+        }
+
+        /**
+         * Convert Experiment Results into a CSV String
+         *
+         * @return a CSV String
+         */
+        String toCsvString() {
+            StringBuilder result = new StringBuilder();
+            result.append(nameOfExperiment).append("\n");
+            for (String colName : cols.keySet()) {
+                result.append(colName);
+                for (String val : cols.get(colName)) {
+                    result.append(";").append(val);
+                }
+                result.append("\n");
+            }
+            return result.toString();
+        }
+
     }
+
 }

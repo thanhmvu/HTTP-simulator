@@ -75,9 +75,11 @@ public class ClientApp {
                 }
             } else {
                 print("Version " + this.httpVersion + ". Downloading first web page in the list ...");
-                print("requesting " + urls.get(0) + " ...");
-                Document doc = retrieveWebPage(urls.get(0));
-                display(doc);
+                for (String url : urls) {
+                    print("requesting " + url + " ...");
+                    Document doc = retrieveWebPage(url);
+                    display(doc);
+                }
             }
         }
         long end = System.currentTimeMillis();
@@ -87,7 +89,8 @@ public class ClientApp {
     }
 
     /**
-     * ======================= MULTI REQUEST & RECEIVE ======================== *
+     * ======================= MULTI REQUEST & RECEIVE ========================
+     * *
      */
     /**
      * Request and retrieve multiple web pages
@@ -140,15 +143,15 @@ public class ClientApp {
 
     private HashMap<String, String> receiveMulti(ArrayList<RequestPacket> reqPackets)
             throws InterruptedException {
-        ArrayList<ResponsePacket> resPackets = 
-                transportLayer.receiveMultiForClient(httpVersion);
+        ArrayList<ResponsePacket> resPackets
+                = transportLayer.receiveMultiForClient(httpVersion);
 
         HashMap<String, String> pages = new HashMap<>();
-        for(ResponsePacket resPacket: resPackets){
+        for (ResponsePacket resPacket : resPackets) {
             String url = resPacket.getValue("URL");
             switch (resPacket.getStatusCode()) {
                 case 200: // OK
-                    print("receiving "+url+". Status 200");
+                    print("receiving " + url + ". Status 200");
                     pages.put(url, resPacket.getBody());
                     // cache the recieved object
                     localCache.cache(url,
@@ -164,7 +167,7 @@ public class ClientApp {
                     break;
             }
         }
-        
+
         return pages;
     }
 
@@ -328,7 +331,9 @@ public class ClientApp {
         }
     }
 
-    /** =============================== MAIN ============================= **/
+    /**
+     * =============================== MAIN ============================= *
+     */
     public static void main(String[] args) throws Exception {
         System.out.println();
         ClientApp client = new ClientApp(1.0, 1000, 10);
