@@ -33,9 +33,57 @@ public class TransportLayer {
      * @param httpVersion HTTP version 1.0, 1.1, 1.2
      * @throws InterruptedException If the thread is disrupted
      */
-    public void sendForClient(ArrayList<RequestPacket> reqPackets, double httpVersion) 
+    
+    /** ======================= CLIENT 1.0 & 1.1 ======================== **/
+    /**
+     * Send a payload
+     *
+     * @param payload The payload
+     * @param httpVersion HTTP version 1.0, 1.1
+     * @throws InterruptedException If the thread is disrupted
+     */
+    public void sendForClient(byte[] payload, double httpVersion) throws InterruptedException {
+        if(!server && (httpVersion == 1.0 || httpVersion == 1.1)){
+            handShakeIfNoConnection();
+            if (payload == null) {
+                closeConnection();
+                return;
+            }
+            print("sending packet of size " + payload.length + "bytes");
+            networkLayer.send(payload);
+        }
+    }
+
+    /**
+     * Receive a payload from the outputstream
+     *
+     * @param httpVersion HTTP version - 1.0, 1.1, 1.2
+     * @return a byte array that is the payload
+     * @throws InterruptedException If the thread is disrupted
+     */
+    public byte[] receiveForClient(double httpVersion) throws InterruptedException {
+        if(!server && (httpVersion == 1.0 || httpVersion == 1.1)){
+            byte[] payload = receive();
+            // if non-persistent, Close connection when client received the packet
+            if (httpVersion == 1.0) {
+                closeConnection();
+            }
+            return payload;
+        }
+        return null;
+    }
+    
+    /** ========================== CLIENT 1.2 =========================== **/
+    /**
+     * Send a list of payload
+     *
+     * @param payload The payload
+     * @param httpVersion HTTP version 1.2 only
+     * @throws InterruptedException If the thread is disrupted
+     */
+    public void sendMultiForClient(ArrayList<RequestPacket> reqPackets, double httpVersion) 
             throws InterruptedException {
-        if(!server){
+        if(!server && httpVersion == 1.2){
             for(RequestPacket reqPacket: reqPackets){
                 handShakeIfNoConnection();
                 
@@ -44,19 +92,30 @@ public class TransportLayer {
                 networkLayer.send(payload);
                 
                 this.remainingRequests++;
-
-                // if non-persistent, Close connection when client received one packet
-                if (httpVersion == 1.0 && server) {
-                    closeConnection();
-                }
-                // if multiplex, Close connection when client received the whole list
-                if (httpVersion == 1.2 && server) {
-                    closeConnection();
-                }
             }
         }
     }
     
+    public ArrayList<ResponsePacket> receiveMultiForClient(double httpVersion) 
+            throws InterruptedException 
+    {
+        ArrayList<ResponsePacket> resPackets = new ArrayList<>();
+        while(this.remainingRequests > 0){
+            byte[] payload = receive();
+            ResponsePacket resPacket = new ResponsePacket(new String(payload));
+            resPackets.add(resPacket);
+            
+            // if non-persistent, Close connection when client received the packet
+            if (httpVersion == 1.0 && !server) {
+                closeConnection();
+            }
+            
+            this.remainingRequests--;
+        }
+        return resPackets;
+    }
+    
+    /** ============================ SERVER ============================= **/
     /**
      * Send a payload
      *
@@ -72,45 +131,13 @@ public class TransportLayer {
         }
         print("sending packet of size " + payload.length + "bytes");
         networkLayer.send(payload);
-
         // if non-persistent, Close connection when client received the packet
         if (httpVersion == 1.0 && server) {
             closeConnection();
         }
     }
 
-    /**
-     * Receive a payload from the outputstream
-     *
-     * @param httpVersion HTTP version - 1.0, 1.1, 1.2
-     * @return a byte array that is the payload
-     * @throws InterruptedException If the thread is disrupted
-     */
-    public byte[] receiveForClient(double httpVersion) throws InterruptedException {
-        byte[] payload = receive();
-        // if non-persistent, Close connection when client received the packet
-        if (httpVersion == 1.0 && !server) {
-            closeConnection();
-        }
-        return payload;
-    }
-//    public ArrayList<ResponsePacket> receiveForClient(double httpVersion) 
-//            throws InterruptedException 
-//    {
-//        ArrayList<ResponsePacket> resPackets = new ArrayList<>();
-//        while(this.remainingRequests > 0){
-//            byte[] payload = receive();
-//            ResponsePacket resPacket = new ResponsePacket(new String(payload));
-//            resPackets.add(resPacket);
-//            
-//            // if non-persistent, Close connection when client received the packet
-//            if (httpVersion == 1.0 && !server) {
-//                closeConnection();
-//            }
-//        }
-//        return resPackets;
-//    }
-
+    // make this private after separate client-server
     public byte[] receive() throws InterruptedException {
         handShakeIfNoConnection();
         byte[] payload = networkLayer.receive();

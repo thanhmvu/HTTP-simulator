@@ -53,7 +53,7 @@ public class ClientApp {
         Document doc = retrieveWebPage(url);
         long end = System.currentTimeMillis();
         long responseTime = (end - start);
-        print("Response time: " + responseTime + " ms");
+        print("Total response time: " + responseTime + " ms");
 
         display(doc);
         return responseTime;
@@ -93,26 +93,32 @@ public class ClientApp {
         }
         return docs;
     }
-    private void requestMulti(ArrayList<RequestPacket> reqPackets) throws InterruptedException {
+    
+    private void requestMulti(ArrayList<RequestPacket> reqPackets) 
+            throws InterruptedException 
+    {
         // check if object was cached before
-//        if (localCache.existsInCache(reqPacket.getUrl())) {
-//            reqPacket.addHeading("If-modified-since", localCache.getCachedLastModifiedTime(reqPacket.getUrl()));
-//            System.out.println("Found existing cache. Send conditional GET");
-//        } else {
-//            System.out.println("No existing cache found. Send normal GET");
-//        }
-//
-//        // convert request to byte array and send to transport layer
-//        byte[] byteArray = reqPacket.toProtocol().getBytes();
-//        transportLayer.send(byteArray, httpVersion);
+        for(RequestPacket reqPacket: reqPackets){
+            if (localCache.existsInCache(reqPacket.getUrl())) {
+                reqPacket.addHeading("If-modified-since", 
+                        localCache.getCachedLastModifiedTime(reqPacket.getUrl()));
+                System.out.println("Found existing cache. Send conditional GET");
+            } else {
+                System.out.println("No existing cache found. Send normal GET");
+            }
+            
+            transportLayer.sendMultiForClient(reqPackets, httpVersion);
+        }
     }
 
-    private HashMap<String,String> receiveMulti(ArrayList<RequestPacket> reqPackets) throws InterruptedException {
+    private HashMap<String,String> receiveMulti(ArrayList<RequestPacket> reqPackets) 
+            throws InterruptedException 
+    {
         byte[] byteArray = transportLayer.receiveForClient(httpVersion);
         String response = new String(byteArray);
         ResponsePacket resPacket = new ResponsePacket(response);
 
-         HashMap<String,String> requestedObj = null;
+        HashMap<String,String> requestedObj = null;
 //        switch (resPacket.getStatusCode()) {
 //            case 200: // OK
 //                requestedObj = resPacket.getBody();
@@ -143,8 +149,12 @@ public class ClientApp {
         Document doc = null;
         try {
             RequestPacket reqPacket = new RequestPacket(httpVersion, "GET", url);
+            
+            long start = System.currentTimeMillis();
             request(reqPacket);
             String content = receive(reqPacket);
+            long end = System.currentTimeMillis();
+            print("Time to get "+ url+ ": " + (end-start) + " ms");
 
             // Convert content to Document
             doc = new Document(url, content);
@@ -165,7 +175,8 @@ public class ClientApp {
     private void request(RequestPacket reqPacket) throws InterruptedException {
         // check if object was cached before
         if (localCache.existsInCache(reqPacket.getUrl())) {
-            reqPacket.addHeading("If-modified-since", localCache.getCachedLastModifiedTime(reqPacket.getUrl()));
+            reqPacket.addHeading("If-modified-since", 
+                    localCache.getCachedLastModifiedTime(reqPacket.getUrl()));
             System.out.println("Found existing cache. Send conditional GET");
         } else {
             System.out.println("No existing cache found. Send normal GET");
@@ -173,7 +184,7 @@ public class ClientApp {
 
         // convert request to byte array and send to transport layer
         byte[] byteArray = reqPacket.toProtocol().getBytes();
-        transportLayer.send(byteArray, httpVersion);
+        transportLayer.sendForClient(byteArray, httpVersion);
     }
 
     private String receive(RequestPacket reqPacket) throws InterruptedException {
@@ -277,12 +288,12 @@ public class ClientApp {
     /** =============================== MAIN ============================= **/
     public static void main(String[] args) throws Exception {
         System.out.println();
-        ClientApp client = new ClientApp(1.0, 50, 5);
+        ClientApp client = new ClientApp(1.0, 1000, 10);
         print("This is Client App:");
-        client.downloadWebPage("parent.txt");
-
-        client.reset();
-        client.setPropDelay(100);
-        client.downloadWebPage("parent.txt");
+        client.downloadWebPage("pA2.txt");
+//
+//        client.reset();
+//        client.setPropDelay(100);
+//        client.downloadWebPage("parent.txt");
     }
 }
