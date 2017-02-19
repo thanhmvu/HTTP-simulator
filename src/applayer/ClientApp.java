@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -110,7 +110,7 @@ public class ClientApp {
 
             // request and receive
             requestMulti(reqPackets);
-            HashMap<String, String> pages = receiveMulti(reqPackets); // <url, content>
+            LinkedHashMap<String, String> pages = receiveMulti(reqPackets); // <url, content>
 
             // recursively create Doc and retrieve embedded files
             for (String url : pages.keySet()) {
@@ -141,12 +141,12 @@ public class ClientApp {
         transportLayer.sendMultiForClient(reqPackets, httpVersion);
     }
 
-    private HashMap<String, String> receiveMulti(ArrayList<RequestPacket> reqPackets)
+    private LinkedHashMap<String, String> receiveMulti(ArrayList<RequestPacket> reqPackets)
             throws InterruptedException {
         ArrayList<ResponsePacket> resPackets
                 = transportLayer.receiveMultiForClient(httpVersion);
 
-        HashMap<String, String> pages = new HashMap<>();
+        LinkedHashMap<String, String> pages = new LinkedHashMap<>();
         for (ResponsePacket resPacket : resPackets) {
             String url = resPacket.getValue("URL");
             switch (resPacket.getStatusCode()) {
