@@ -74,7 +74,7 @@ public class ClientApp {
                     display(doc);
                 }
             } else {
-                print("Version " + this.httpVersion + ". Downloading first web page in the list ...");
+                print("Version " + this.httpVersion + ". Downloading each web page separately ...");
                 for (String url : urls) {
                     print("requesting " + url + " ...");
                     Document doc = retrieveWebPage(url);
@@ -109,8 +109,9 @@ public class ClientApp {
             }
 
             // request and receive
-            requestMulti(reqPackets);
-            LinkedHashMap<String, String> pages = receiveMulti(reqPackets); // <url, content>
+//            requestMulti(reqPackets);
+//            LinkedHashMap<String, String> pages = receiveMulti(reqPackets); // <url, content>
+            LinkedHashMap<String,String> pages = requestAndReceiveMulti(reqPackets); // <url, content>
 
             // recursively create Doc and retrieve embedded files
             for (String url : pages.keySet()) {
@@ -125,31 +126,36 @@ public class ClientApp {
         }
         return docs;
     }
-
-    private void requestMulti(ArrayList<RequestPacket> reqPackets)
-            throws InterruptedException {
+    
+    private LinkedHashMap<String, String> requestAndReceiveMulti(ArrayList<RequestPacket> reqPackets)
+            throws InterruptedException 
+    {
+        // ------------------ REQUEST ------------------ //
         // check if object was cached before
-        for (RequestPacket reqPacket : reqPackets) {
-            if (localCache.existsInCache(reqPacket.getUrl())) {
+        for (RequestPacket reqPacket : reqPackets) 
+        {
+            if (localCache.existsInCache(reqPacket.getUrl())) 
+            {
                 reqPacket.addHeading("If-modified-since",
                         localCache.getCachedLastModifiedTime(reqPacket.getUrl()));
                 System.out.println("Found existing cache. Send conditional GET");
-            } else {
+            } 
+            else 
+            {
                 System.out.println("No existing cache found. Send normal GET");
             }
         }
-        transportLayer.sendMultiForClient(reqPackets, httpVersion);
-    }
-
-    private LinkedHashMap<String, String> receiveMulti(ArrayList<RequestPacket> reqPackets)
-            throws InterruptedException {
-        ArrayList<ResponsePacket> resPackets
-                = transportLayer.receiveMultiForClient(httpVersion);
-
+        
+        ArrayList<ResponsePacket> resPackets = transportLayer.sendAndReceiveMultiForClient(reqPackets, httpVersion);
+        
+        // ------------------ RECEIVE ------------------ //
         LinkedHashMap<String, String> pages = new LinkedHashMap<>();
-        for (ResponsePacket resPacket : resPackets) {
+        
+        for (ResponsePacket resPacket : resPackets) 
+        {
             String url = resPacket.getValue("URL");
-            switch (resPacket.getStatusCode()) {
+            switch (resPacket.getStatusCode()) 
+            {
                 case 200: // OK
                     print("receiving " + url + ". Status 200");
                     pages.put(url, resPacket.getBody());
@@ -158,10 +164,12 @@ public class ClientApp {
                             resPacket.getValue("Last-Modified"),
                             resPacket.getBody());
                     break;
+                    
                 case 304: // Not modified
                     print(url + "is not modified. Retrieved from cached.");
                     pages.put(url, localCache.getCachedContent(url));
                     break;
+                    
                 case 404: // Not found
                     pages.put(url, resPacket.getBody());
                     break;
@@ -170,6 +178,51 @@ public class ClientApp {
 
         return pages;
     }
+
+//    private void requestMulti(ArrayList<RequestPacket> reqPackets)
+//            throws InterruptedException {
+//        // check if object was cached before
+//        for (RequestPacket reqPacket : reqPackets) {
+//            if (localCache.existsInCache(reqPacket.getUrl())) {
+//                reqPacket.addHeading("If-modified-since",
+//                        localCache.getCachedLastModifiedTime(reqPacket.getUrl()));
+//                System.out.println("Found existing cache. Send conditional GET");
+//            } else {
+//                System.out.println("No existing cache found. Send normal GET");
+//            }
+//        }
+//        transportLayer.sendMultiForClient(reqPackets, httpVersion);
+//    }
+//
+//    private LinkedHashMap<String, String> receiveMulti(ArrayList<RequestPacket> reqPackets)
+//            throws InterruptedException {
+//        ArrayList<ResponsePacket> resPackets
+//                = transportLayer.receiveMultiForClient(httpVersion);
+//
+//        LinkedHashMap<String, String> pages = new LinkedHashMap<>();
+//        for (ResponsePacket resPacket : resPackets) {
+//            String url = resPacket.getValue("URL");
+//            switch (resPacket.getStatusCode()) {
+//                case 200: // OK
+//                    print("receiving " + url + ". Status 200");
+//                    pages.put(url, resPacket.getBody());
+//                    // cache the recieved object
+//                    localCache.cache(url,
+//                            resPacket.getValue("Last-Modified"),
+//                            resPacket.getBody());
+//                    break;
+//                case 304: // Not modified
+//                    print(url + "is not modified. Retrieved from cached.");
+//                    pages.put(url, localCache.getCachedContent(url));
+//                    break;
+//                case 404: // Not found
+//                    pages.put(url, resPacket.getBody());
+//                    break;
+//            }
+//        }
+//
+//        return pages;
+//    }
 
     /**
      * ======================= REQUEST & RECEIVE ======================== *

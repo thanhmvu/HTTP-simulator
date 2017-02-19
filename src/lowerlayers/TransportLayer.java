@@ -74,16 +74,14 @@ public class TransportLayer {
     }
     
     /** ========================== CLIENT 1.2 =========================== **/
-    /**
-     * Send a list of payload
-     *
-     * @param payload The payload
-     * @param httpVersion HTTP version 1.2 only
-     * @throws InterruptedException If the thread is disrupted
-     */
-    public void sendMultiForClient(ArrayList<RequestPacket> reqPackets, double httpVersion) 
-            throws InterruptedException {
-        if(!server && httpVersion == 1.2){
+    
+    public ArrayList<ResponsePacket> sendAndReceiveMultiForClient(
+            ArrayList<RequestPacket> reqPackets, double httpVersion) throws InterruptedException
+    {
+        if(!server && httpVersion == 1.2)
+        {
+            ArrayList<ResponsePacket> resPackets = new ArrayList<>();
+            
             for(int i = 0; i< reqPackets.size(); i++){
                 RequestPacket reqPacket = reqPackets.get(i);
                 
@@ -93,16 +91,58 @@ public class TransportLayer {
 
                 handShakeIfNoConnection();
                 
+                // send to network layer
                 byte[] payload = reqPacket.toProtocol().getBytes();
                 print("sending packet of size " + payload.length + "bytes");
                 networkLayer.send(payload);
                 
-                this.remainingRequests++;
+                // receive from network layer
+                payload = receive();
+                ResponsePacket resPacket = new ResponsePacket(new String(payload));
+                resPackets.add(resPacket);
             }
-        } else {
+            
+            // close connection when get the whole list of response packets
+            closeConnection();
+            
+            return resPackets;
+        } 
+        else 
+        {
             print("ERROR: Not a client or not HTTP 1.2");
         }
+        return null;
     }
+    
+//    /**
+//     * Send a list of payload
+//     *
+//     * @param payload The payload
+//     * @param httpVersion HTTP version 1.2 only
+//     * @throws InterruptedException If the thread is disrupted
+//     */
+//    public void sendMultiForClient(ArrayList<RequestPacket> reqPackets, double httpVersion) 
+//            throws InterruptedException {
+//        if(!server && httpVersion == 1.2){
+//            for(int i = 0; i< reqPackets.size(); i++){
+//                RequestPacket reqPacket = reqPackets.get(i);
+//                
+//                // add heading to notice server to close after the last packet
+//                String value = "" + (i == reqPackets.size()-1);
+//                reqPacket.addHeading("Close-after-this",value);
+//
+//                handShakeIfNoConnection();
+//                
+//                byte[] payload = reqPacket.toProtocol().getBytes();
+//                print("sending packet of size " + payload.length + "bytes");
+//                networkLayer.send(payload);
+//                
+//                this.remainingRequests++;
+//            }
+//        } else {
+//            print("ERROR: Not a client or not HTTP 1.2");
+//        }
+//    }
     
     public ArrayList<ResponsePacket> receiveMultiForClient(double httpVersion) 
             throws InterruptedException 
