@@ -113,45 +113,44 @@ public class ExperimentController {
         String finalResult = "";
         int initDelay, increment;
         // ================ Transmission Delay ================ //
-//        int initDelay = 2;
-//        int increment = 3;
-//        // Non-Persistent + Cached
-//        ExperimentResults nonPersTransResults = this.runTransExp(initDelay, runs, increment, trialsPerRun, 1.0, true);
-//        // Persistent
-//        ExperimentResults persTransResults = this.runTransExp(initDelay, runs, increment, trialsPerRun, 1.1, false);
-//        // Multiplex
-//        ExperimentResults mulTransResults = this.runTransExp(initDelay, runs, increment, trialsPerRun, 1.2, false);
-//
-//        finalResult += nonPersTransResults.toCsvString()
-//                + persTransResults.toCsvString()
-//                + mulTransResults.toCsvString();
+        initDelay = 2;
+        increment = 3;
+        // Non-Persistent + Cached
+        ExperimentResults nonPersTransResults = this.runTransExp(initDelay, runs, increment, trialsPerRun, 1.0, true);
+        // Persistent
+        ExperimentResults persTransResults = this.runTransExp(initDelay, runs, increment, trialsPerRun, 1.1, false);
+        // Multiplex
+        ExperimentResults mulTransResults = this.runTransExp(initDelay, runs, increment, trialsPerRun, 1.2, false);
+
+        finalResult += nonPersTransResults.toCsvString()
+                + persTransResults.toCsvString()
+                + mulTransResults.toCsvString();
 
         // ================ Propagation Delay ================ //
-//        initDelay = 100;
-//        increment = 20;
-//
-//        // Non-Persistent
-//        ExperimentResults nonPersPropResults = this.runPropExp(initDelay, runs, increment, trialsPerRun, 1.0);
-//        // Persistent
-//        ExperimentResults persPropResults = this.runPropExp(initDelay, runs, increment, trialsPerRun, 1.1);
-//        // Multiplex
-//        ExperimentResults mulPropResults = this.runPropExp(initDelay, runs, increment, trialsPerRun, 1.2);
-//
-//        finalResult += nonPersPropResults.toCsvString()
-//                + persPropResults.toCsvString()
-//                + mulPropResults.toCsvString();
+        initDelay = 100;
+        increment = 20;
+
+        // Non-Persistent
+        ExperimentResults nonPersPropResults = this.runPropExp(initDelay, runs, increment, trialsPerRun, 1.0);
+        // Persistent
+        ExperimentResults persPropResults = this.runPropExp(initDelay, runs, increment, trialsPerRun, 1.1);
+        // Multiplex
+        ExperimentResults mulPropResults = this.runPropExp(initDelay, runs, increment, trialsPerRun, 1.2);
+
+        finalResult += nonPersPropResults.toCsvString()
+                + persPropResults.toCsvString()
+                + mulPropResults.toCsvString();
 
         // ================ Object Number ================ //
 //        // Non-Persistent
-//        ExperimentResults nonPersObjsResults = this.runObjNumberExp(runs, trialsPerRun, 1.0);
+        ExperimentResults nonPersObjsResults = this.runObjNumberExp(runs, trialsPerRun, 1.0);
 //        // Persistent
-//        ExperimentResults persObjsResults = this.runObjNumberExp(runs, trialsPerRun, 1.1);
+        ExperimentResults persObjsResults = this.runObjNumberExp(runs, trialsPerRun, 1.1);
         // Multiplex
         ExperimentResults mulObjsResults = this.runObjNumberExp(runs, trialsPerRun, 1.2);
 
-        finalResult += 
-//                nonPersObjsResults.toCsvString()
-//                + persObjsResults.toCsvString() +
+        finalResult +=                nonPersObjsResults.toCsvString()
+                + persObjsResults.toCsvString() +
                 mulObjsResults.toCsvString()
                 ;
         // ================ Print To File ================ //
