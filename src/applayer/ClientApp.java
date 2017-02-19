@@ -143,7 +143,7 @@ public class ClientApp {
         ArrayList<ResponsePacket> resPackets = 
                 transportLayer.receiveMultiForClient(httpVersion);
 
-        HashMap<String, String> pages = null;
+        HashMap<String, String> pages = new HashMap<>();
         for(ResponsePacket resPacket: resPackets){
             String url = resPacket.getValue("URL");
             switch (resPacket.getStatusCode()) {
