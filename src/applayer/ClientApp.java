@@ -40,77 +40,7 @@ public class ClientApp {
     }
 
     /**
-     * Request and retrieve a Document object of a file
-     *
-     * @param url The URL of the file
-     * @return The document representing the file
-     */
-    public Document request(String url) {
-        Document doc = null;
-        try {
-//            long start = System.currentTimeMillis();
-            RequestPacket reqPacket = new RequestPacket(httpVersion, "GET", url);
-            String content = requestAndReceive(reqPacket);
-//            long end = System.currentTimeMillis();
-//            print("Time to get "+ url +" : "+ (end-start) + " ms");
-
-            // Convert content to Document
-            doc = new Document(url, content);
-
-            // recursively retrieve embedded files
-            for (Document file : doc.getEmbdFiles()) {
-                Document embdContent = this.request(file.getUrl());
-                doc.addEmbdDoc(file.getUrl(), embdContent);
-            }
-
-        } catch (InterruptedException ex) {
-            Logger.getLogger(ClientApp.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return doc;
-    }
-
-    /**
-     * Method that runs the client application, accepting input requests from
-     * users via standard input
-     */
-    public void test() {
-        try {
-            //read in first line from keyboard
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-            String line = reader.readLine();
-
-            //while line is not empty
-            while (line != null && !line.equals("")) {
-                String url = line;
-
-                long start = System.currentTimeMillis();
-                RequestPacket reqPacket = new RequestPacket(httpVersion, "GET", url);
-                String content = requestAndReceive(reqPacket);
-                long end = System.currentTimeMillis();
-                print("Response time: " + (end - start) + " ms");
-
-                print(content);
-
-                //read next line
-                line = reader.readLine();
-            }
-        } catch (IOException | InterruptedException ex) {
-            Logger.getLogger(ClientApp.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    /**
-     * Method to display a document
-     *
-     * @param doc the document object to display
-     */
-    private void display(Document doc) {
-        print("Server responses: \n" + doc.getFullText());
-    }
-
-    /**
-     * Experiment method that examines response time of the network simulation
+     * Experiment method that retrieves and displays a web page
      *
      * @return time to get the whole web page
      */
@@ -119,7 +49,7 @@ public class ClientApp {
         print("requesting " + url + " ...");
 
         long start = System.currentTimeMillis();
-        Document doc = request(url);
+        Document doc = retrieveWebPage(url);
         long end = System.currentTimeMillis();
         long responseTime = (end - start);
         print("Response time: " + responseTime + " ms");
@@ -128,18 +58,34 @@ public class ClientApp {
         return responseTime;
     }
 
-    //==================REQUEST AND RECEIVE METHODS===========================
+    /** ======================= REQUEST & RECEIVE ======================== **/
     /**
-     * Request and receive
+     * Request and retrieve a Document object of a file
      *
-     * @param reqPacket
-     * @return
-     * @throws InterruptedException
+     * @param url The URL of the file
+     * @return The document representing the file
      */
-    public String requestAndReceive(RequestPacket reqPacket) throws InterruptedException {
-        request(reqPacket);
-        String response = receive(reqPacket);
-        return response;
+    private Document retrieveWebPage(String url) {
+        Document doc = null;
+        try {
+            RequestPacket reqPacket = new RequestPacket(httpVersion, "GET", url);
+            request(reqPacket);
+            String content = receive(reqPacket);
+
+            // Convert content to Document
+            doc = new Document(url, content);
+
+            // recursively retrieve embedded files
+            for (Document file : doc.getEmbdFiles()) {
+                Document embdContent = this.retrieveWebPage(file.getUrl());
+                doc.addEmbdDoc(file.getUrl(), embdContent);
+            }
+
+        } catch (InterruptedException ex) {
+            Logger.getLogger(ClientApp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return doc;
     }
 
     private void request(RequestPacket reqPacket) throws InterruptedException {
@@ -181,7 +127,7 @@ public class ClientApp {
         return requestedObj;
     }
     
-    //=============SET PARAMETERS====================
+    /** ============================ SETTERS ============================= **/
     public void setPropDelay(long propDelay) {
         transportLayer.setPropDelay(propDelay);
     }
@@ -204,7 +150,16 @@ public class ClientApp {
         localCache.empty();
     }
     
-    //==============HELPER=====================
+    /** ============================= HELPERS ============================ **/
+    /**
+     * Method to display a document
+     * 
+     * @param doc the document object to display
+     */
+    private void display(Document doc) {
+        print("Server responses: \n" + doc.getFullText());
+    }
+    
     /**
      * Method to print client logs in a specific format
      *
@@ -215,8 +170,37 @@ public class ClientApp {
     }
 
     /**
-     * =============================== Main ============================= *
+     * Method that runs the client application, 
+     * accepting input requests from users via standard input
      */
+    public void test() {
+        try {
+            //read in first line from keyboard
+            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+            String line = reader.readLine();
+
+            //while line is not empty
+            while (line != null && !line.equals("")) {
+                String url = line;
+
+                long start = System.currentTimeMillis();
+                RequestPacket reqPacket = new RequestPacket(httpVersion, "GET", url);
+                request(reqPacket);
+                String content = receive(reqPacket);
+                long end = System.currentTimeMillis();
+                print("Response time: " + (end - start) + " ms");
+
+                print(content);
+
+                //read next line
+                line = reader.readLine();
+            }
+        } catch (IOException | InterruptedException ex) {
+            Logger.getLogger(ClientApp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /** =============================== MAIN ============================= **/
     public static void main(String[] args) throws Exception {
         System.out.println();
         ClientApp client = new ClientApp(1.0, 50, 5);
