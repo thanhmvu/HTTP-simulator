@@ -5,13 +5,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.FileTime;
-import java.text.ParseException;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
 import lowerlayers.TransportLayer;
 
 /**
@@ -22,8 +15,8 @@ import lowerlayers.TransportLayer;
  */
 public class ServerApp {
 
-    private TransportLayer transportLayer;
-    private String root = "assets/server-db/";
+    private final TransportLayer transportLayer;
+    private final String root = "assets/server-db/";
 
     /**
      * Set up a server
