@@ -1,0 +1,12 @@
+Correctness for HTTP 1.0 with caching
+HTTP Version;1.0
+Propagation Delay;1000
+Transmission Delay Per Byte;10
+Uncached Response Time;14019
+Cached Response Time;10272
+Correctness for HTTP 1.1
+HTTP Version;1.1
+Propagation Delay;1000
+Transmission Delay Per Byte;10
+Uncached Response Time;10558
+

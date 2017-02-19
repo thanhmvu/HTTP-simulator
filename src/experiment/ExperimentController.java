@@ -27,6 +27,9 @@ public class ExperimentController {
 
     private ClientApp client;
 
+    /**
+     * This class holds all the experiment results
+     */
     private class ExperimentResults {
 
         private String nameOfExperiment;
@@ -71,6 +74,128 @@ public class ExperimentController {
         client = new ClientApp(1.0, 100, 2);
     }
 
+//================CORRECTNESS CHECKING=======================================
+    /**
+     * Check correctness of experiment
+     *
+     * @param outputFile The name of the output file
+     */
+    public void checkCorrectness(String outputFile) {
+
+        long propDelay = 400;
+        long transDelayPerByte = 3;
+        int numTrials = 3;
+        ExperimentResults nonPersCache = this.checkCorrectnessForVer(1.0, propDelay, transDelayPerByte, true, numTrials);
+        ExperimentResults pers = this.checkCorrectnessForVer(1.1, propDelay, transDelayPerByte, false, numTrials);
+        // ExperimentResults mul = this.checkCorrectnessForVer(1.2, propDelay, transDelayPerByte, false, numTrials);
+
+        String finalResult = nonPersCache.toCsvString()
+                + pers.toCsvString() //+ mul.toCsvString()
+                ;
+        try {
+            this.printToFile(outputFile, finalResult);
+        } catch (IOException ex) {
+            Logger.getLogger(ExperimentController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+    /**
+     * Experiment to check for correctness
+     *
+     * @param httpVersion Version of HTTP
+     * @param propDelay Prop delay
+     * @param transDelayPerByte Trans delay per byte
+     * @param hasCache Whether the experiment should have cache
+     * @return An experiment result
+     */
+    private ExperimentResults checkCorrectnessForVer(double httpVersion, long propDelay, long transDelayPerByte, boolean hasCache, int numTrials) {
+
+        ExperimentResults results = new ExperimentResults("Correctness for HTTP " + httpVersion + (hasCache ? " with caching" : ""));
+        long unCachedSum = 0;
+        long cachedSum = 0;
+        for (int i = 0; i < numTrials; i++) {
+            client.reset();
+            client.setPropDelay(propDelay);
+            client.setTransDelayPerByte(transDelayPerByte);
+            client.setHttpVersion(httpVersion);
+            unCachedSum += downloadTwoWebpages(2);
+            if (hasCache) {
+                cachedSum += downloadTwoWebpages(2);
+            }
+        }
+        //add to result table
+        results.add("HTTP Version", Double.toString(httpVersion));
+        results.add("Propagation Delay", Long.toString(propDelay));
+        results.add("Transmission Delay Per Byte", Long.toString(transDelayPerByte));
+        results.add("Uncached Response Time", Long.toString(unCachedSum / numTrials));
+
+        if (hasCache) {
+            results.add("Cached Response Time", Long.toString(cachedSum / numTrials));
+        }
+        return results;
+    }
+//==================EXPERIMENT=====================================
+
+    /**
+     * Run experiment
+     *
+     * @param outputFile The name of the output file
+     * @throws FileNotFoundException
+     */
+    public void runExperiment(String outputFile) throws FileNotFoundException {
+
+        // ================ Transmission Delay ================ //
+        int initDelay = 2;
+        int runs = 2;
+        int increment = 3;
+        int trialPerRun = 2;
+
+        // Non-Persistent + Cached
+        ExperimentResults nonPersTransResults = this.runTransExp(initDelay, runs, increment, trialPerRun, 1.0, true);
+        // Persistent
+        ExperimentResults persTransResults = this.runTransExp(initDelay, runs, increment, trialPerRun, 1.1, false);
+        // Multiplex
+        //ExperimentResults mulTransResults = this.runTransExp(initDelay, runs, increment, trialPerRun, 1.2, false);
+
+        // ================ Propagation Delay ================ //
+        initDelay = 100;
+        increment = 20;
+
+        // Non-Persistent
+        ExperimentResults nonPersPropResults = this.runPropExp(initDelay, runs, increment, trialPerRun, 1.0);
+        // Persistent
+        ExperimentResults persPropResults = this.runPropExp(initDelay, runs, increment, trialPerRun, 1.1);
+        // Multiplex
+        //ExperimentResults mulPropResults = this.runPropExp(initDelay, runs, increment, trialPerRun, 1.2);
+
+        // ================ Object Number ================ //
+        // Non-Persistent
+        ExperimentResults nonPersObjsResults = this.runObjNumberExp(runs, trialPerRun, 1.0);
+        // Persistent
+        ExperimentResults persObjsResults = this.runObjNumberExp(runs, trialPerRun, 1.1);
+        // Multiplex
+        //ExperimentResults mulObjsResults = this.runObjNumberExp(runs, trialPerRun, 1.2);
+
+        // ================ Print To File ================ //
+        String finalResult = nonPersTransResults.toCsvString()
+                + persTransResults.toCsvString()
+                //+ mulTransResults.toCsvString()
+                + nonPersPropResults.toCsvString()
+                + persPropResults.toCsvString()
+                //+ mulPropResults.toCsvString()
+                + nonPersObjsResults.toCsvString()
+                + persObjsResults.toCsvString() //+ mulObjsResults.toCsvString()
+                ;
+        try {
+            this.printToFile(outputFile, finalResult);
+        } catch (IOException ex) {
+            Logger.getLogger(ExperimentController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        System.out.println("done!");
+    }
+
     /**
      * Experiment method that runs the experiment for transport delay
      *
@@ -91,9 +216,9 @@ public class ExperimentController {
                 client.reset();
                 client.setHttpVersion(httpVersion);
                 client.setTransDelayPerByte(transDelayPerByte);
-                unCachedSum += downloadWebPages("pA0.txt", "pB0.txt");
+                unCachedSum += downloadTwoWebpages(0);
                 if (includeCache) {
-                    cachedSum += downloadWebPages("pA0.txt", "pB0.txt");
+                    cachedSum += downloadTwoWebpages(0);
                 }
             }
             // take the average
@@ -131,7 +256,7 @@ public class ExperimentController {
                 client.reset();
                 client.setHttpVersion(httpVersion);
                 client.setPropDelay(propDelay);
-                sum += this.downloadWebPages("pA0.txt", "pB0.txt");
+                sum += this.downloadTwoWebpages(0);
             }
             // take the average
             long t = sum / numTrialsPerRun;
@@ -152,12 +277,10 @@ public class ExperimentController {
 
         long sum = 0;
         for (int i = 0; i < numRuns; i++) {
-            String urlA = "pA" + i + ".txt";
-            String urlB = "pB" + i + ".txt";
             for (int j = 0; j < numTrialsPerRun; j++) {
                 client.reset();
                 client.setHttpVersion(httpVersion);
-                sum += this.downloadWebPages(urlA, urlB);
+                sum += this.downloadTwoWebpages(i);
             }
             // take the average
             long t = sum / numTrialsPerRun;
@@ -172,68 +295,18 @@ public class ExperimentController {
 
     }
 
-    public void runExperiment(String outputFile) throws FileNotFoundException {
-
-        
-        // ================ Transmission Delay ================ //
-        int initDelay = 2;
-        int runs = 2;
-        int increment = 3;
-        int trialPerRun = 2;
-
-        // Non-Persistent + Cached
-        ExperimentResults nonPersTransResults = this.runTransExp(initDelay, runs, increment, trialPerRun, 1.0, true);
-        // Persistent
-        ExperimentResults persTransResults = this.runTransExp(initDelay, runs, increment, trialPerRun, 1.1, false);
-        // Multiplex
-        //ExperimentResults mulTransResults = this.runTransExp(initDelay, runs, increment, trialPerRun, 1.2, false);
-        
-        // ================ Propagation Delay ================ //
-        
-        initDelay = 100;
-        increment = 20;
-
-        // Non-Persistent
-        ExperimentResults nonPersPropResults = this.runPropExp(initDelay, runs, increment, trialPerRun, 1.0);
-        // Persistent
-        ExperimentResults persPropResults = this.runPropExp(initDelay, runs, increment, trialPerRun, 1.1);
-        // Multiplex
-        //ExperimentResults mulPropResults = this.runPropExp(initDelay, runs, increment, trialPerRun, 1.2);
-
-        // ================ Object Number ================ //
-        
-        // Non-Persistent
-        ExperimentResults nonPersObjsResults = this.runObjNumberExp(runs, trialPerRun, 1.0);
-        // Persistent
-        ExperimentResults persObjsResults = this.runObjNumberExp(runs, trialPerRun, 1.1);
-        // Multiplex
-        //ExperimentResults mulObjsResults = this.runObjNumberExp(runs, trialPerRun, 1.2);
-        
-        // ================ Print To File ================ //
-        String finalResult = nonPersTransResults.toCsvString() 
-                + persTransResults.toCsvString() 
-                //+ mulTransResults.toCsvString()
-                + nonPersPropResults.toCsvString() 
-                + persPropResults.toCsvString() 
-                //+ mulPropResults.toCsvString()
-                + nonPersObjsResults.toCsvString() 
-                + persObjsResults.toCsvString() 
-                ;
-        try {
-            this.printToFile(outputFile, finalResult);
-        } catch (IOException ex) {
-            Logger.getLogger(ExperimentController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        System.out.println("done!");
-    }
-
-    private long downloadWebPages(String url1, String url2) {
-        ArrayList<String> urls1 = new ArrayList<>();
-        urls1.add(url1);
-        ArrayList<String> urls2 = new ArrayList<>();
-        urls2.add(url2);
-        return client.downloadWebPages(urls1) + client.downloadWebPages(urls2);
+    /**
+     * Download webpages that have the same number of children
+     *
+     * @param numOfChildren The number of children, which affects the file name.
+     * For example: 0 will download pA0.txt and pB0.txt
+     * @return The total response time
+     */
+    private long downloadTwoWebpages(int numOfChildren) {
+        ArrayList<String> urls = new ArrayList<>();
+        urls.add("pA" + numOfChildren + ".txt");
+        urls.add("pB" + numOfChildren + ".txt");
+        return client.downloadWebPages(urls);
     }
 
     /**
@@ -255,6 +328,7 @@ public class ExperimentController {
      */
     public static void main(String[] args) throws Exception {
         ExperimentController ec = new ExperimentController();
-        ec.runExperiment("results.csv");
+        ec.checkCorrectness("correctness.csv");
+        // ec.runExperiment("expResults.csv");
     }
 }
