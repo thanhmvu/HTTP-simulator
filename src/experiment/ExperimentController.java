@@ -30,7 +30,7 @@ public class ExperimentController {
 //=============================== MAIN ============================= 
     public static void main(String[] args) throws Exception {
         ExperimentController ec = new ExperimentController();
-        //ec.checkCorrectness("correctness.csv");
+        ec.checkCorrectness("correctness.csv");
         ec.runExperiment("expResults.csv");
     }
 
