@@ -1,0 +1,11 @@
+pA4.txt 
+4 children:
+<<school/cA41.txt>>
+<<school/cA42.txt>>
+<<school/cA43.txt>>
+<<school/cA44.txt>>
+data data data data
+data data data data
+data data data data
+data data data data
+data data data data

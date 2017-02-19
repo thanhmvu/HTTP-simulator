@@ -1,0 +1,11 @@
+pA3.txt 
+3 children:
+<<school/cA31.txt>>
+<<school/cA32.txt>>
+<<school/cA33.txt>>
+data data data data
+data data data data
+data data data data
+data data data data
+data data data data
+data data data data

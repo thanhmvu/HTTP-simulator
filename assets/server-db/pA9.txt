@@ -1,0 +1,11 @@
+pA9.txt 
+9 children:
+<<school/cA91.txt>>
+<<school/cA92.txt>>
+<<school/cA93.txt>>
+<<school/cA94.txt>>
+<<school/cA95.txt>>
+<<school/cA96.txt>>
+<<school/cA97.txt>>
+<<school/cA98.txt>>
+<<school/cA99.txt>>

@@ -1,0 +1,11 @@
+pB3.txt 
+3 children:
+<<school/cB31.txt>>
+<<school/cB32.txt>>
+<<school/cB33.txt>>
+data data data data
+data data data data
+data data data data
+data data data data
+data data data data
+data data data data

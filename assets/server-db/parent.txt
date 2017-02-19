@@ -1,9 +1,0 @@
-Hello. 
-I am parent.txt
-I have two children, child1.txt and child2.txt. 
-Here they are.
-<<school/child1.txt>>
-<<school/child2.txt>>
-data data data data data data data data data
-Have a nice day.
-Bye.

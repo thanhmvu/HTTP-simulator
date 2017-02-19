@@ -1,0 +1,11 @@
+pA6.txt 
+6 children:
+<<school/cA61.txt>>
+<<school/cA62.txt>>
+<<school/cA63.txt>>
+<<school/cA64.txt>>
+<<school/cA65.txt>>
+<<school/cA66.txt>>
+data data data data
+data data data data
+data data data data

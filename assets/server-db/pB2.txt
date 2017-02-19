@@ -1,0 +1,11 @@
+pB2.txt 
+2 children:
+<<school/cB21.txt>>
+<<school/cB22.txt>>
+data data data data
+data data data data
+data data data data
+data data data data
+data data data data
+data data data data
+data data data data

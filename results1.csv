@@ -1,0 +1,30 @@
+Transmission Delay vs. Response Time
+HTTP Version;1.0;1.0
+Transmission Delay Per Byte;2;5
+Uncached Response Time;1982;3659
+Cached Response Time;2113;4061
+Transmission Delay vs. Response Time
+HTTP Version;1.1;1.1
+Transmission Delay Per Byte;2;5
+Uncached Response Time;1629;3196
+Propagation Delay vs. Response Time
+HTTP Version;1.0;1.0
+Propagation Delay;100;120
+Uncached Response Time;1842;3951
+Propagation Delay vs. Response Time
+HTTP Version;1.1;1.1
+Propagation Delay;100;120
+Uncached Response Time;1630;3233
+Number of Objects vs. Response Time
+HTTP Version;1.0;1.0
+Number of parent objects;2;2
+Number of children per parent;0;1
+Total number of objects;2;4
+Uncached Response Time;944;1994
+Number of Objects vs. Response Time
+HTTP Version;1.1;1.1
+Number of parent objects;2;2
+Number of children per parent;0;1
+Total number of objects;2;4
+Uncached Response Time;730;1353
+

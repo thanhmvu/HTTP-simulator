@@ -86,30 +86,30 @@ public class TransportLayer {
      * @return a byte array that is the payload
      * @throws InterruptedException If the thread is disrupted
      */
-//    public byte[] receiveForClient(double httpVersion) throws InterruptedException {
-//        byte[] payload = receive();
-//        // if non-persistent, Close connection when client received the packet
-//        if (httpVersion == 1.0 && !server) {
-//            closeConnection();
-//        }
-//        return payload;
-//    }
-    public ArrayList<ResponsePacket> receiveForClient(double httpVersion) 
-            throws InterruptedException 
-    {
-        ArrayList<ResponsePacket> resPackets = new ArrayList<>();
-        while(this.remainingRequests > 0){
-            byte[] payload = receive();
-            ResponsePacket resPacket = new ResponsePacket(new String(payload));
-            resPackets.add(resPacket);
-            
-            // if non-persistent, Close connection when client received the packet
-            if (httpVersion == 1.0 && !server) {
-                closeConnection();
-            }
+    public byte[] receiveForClient(double httpVersion) throws InterruptedException {
+        byte[] payload = receive();
+        // if non-persistent, Close connection when client received the packet
+        if (httpVersion == 1.0 && !server) {
+            closeConnection();
         }
-        return resPackets;
+        return payload;
     }
+//    public ArrayList<ResponsePacket> receiveForClient(double httpVersion) 
+//            throws InterruptedException 
+//    {
+//        ArrayList<ResponsePacket> resPackets = new ArrayList<>();
+//        while(this.remainingRequests > 0){
+//            byte[] payload = receive();
+//            ResponsePacket resPacket = new ResponsePacket(new String(payload));
+//            resPackets.add(resPacket);
+//            
+//            // if non-persistent, Close connection when client received the packet
+//            if (httpVersion == 1.0 && !server) {
+//                closeConnection();
+//            }
+//        }
+//        return resPackets;
+//    }
 
     public byte[] receive() throws InterruptedException {
         handShakeIfNoConnection();

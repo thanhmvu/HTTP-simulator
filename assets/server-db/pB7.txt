@@ -1,0 +1,11 @@
+pB7.txt 
+7 children:
+<<school/cB71.txt>>
+<<school/cB72.txt>>
+<<school/cB73.txt>>
+<<school/cB74.txt>>
+<<school/cB75.txt>>
+<<school/cB76.txt>>
+<<school/cB77.txt>>
+data data data data
+data data data data
