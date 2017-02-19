@@ -9,7 +9,7 @@ public class TransportLayer {
     private final NetworkLayer networkLayer;
     boolean connectionOpen;
     boolean server;
-    int remainingRequests;
+//    int remainingRequests;
 
     /**
      * Build transport layer
@@ -23,7 +23,7 @@ public class TransportLayer {
         networkLayer = new NetworkLayer(server, propDelay, transDelayPerByte);
         this.server = server;
         connectionOpen = false;
-        remainingRequests = 0;
+//        remainingRequests = 0;
     }
 
     /**
@@ -144,26 +144,26 @@ public class TransportLayer {
 //        }
 //    }
     
-    public ArrayList<ResponsePacket> receiveMultiForClient(double httpVersion) 
-            throws InterruptedException 
-    {
-        if(!server && httpVersion == 1.2){
-            ArrayList<ResponsePacket> resPackets = new ArrayList<>();
-            while(this.remainingRequests > 0){
-                byte[] payload = receive();
-                ResponsePacket resPacket = new ResponsePacket(new String(payload));
-                resPackets.add(resPacket);
-
-                this.remainingRequests--;
-            }
-            // close connection when get the whole list of response packets
-            closeConnection();
-            return resPackets;
-        } else {
-            print("ERROR: Not a client or not HTTP 1.2");
-        }
-        return null;
-    }
+//    public ArrayList<ResponsePacket> receiveMultiForClient(double httpVersion) 
+//            throws InterruptedException 
+//    {
+//        if(!server && httpVersion == 1.2){
+//            ArrayList<ResponsePacket> resPackets = new ArrayList<>();
+//            while(this.remainingRequests > 0){
+//                byte[] payload = receive();
+//                ResponsePacket resPacket = new ResponsePacket(new String(payload));
+//                resPackets.add(resPacket);
+//
+//                this.remainingRequests--;
+//            }
+//            // close connection when get the whole list of response packets
+//            closeConnection();
+//            return resPackets;
+//        } else {
+//            print("ERROR: Not a client or not HTTP 1.2");
+//        }
+//        return null;
+//    }
     
     /** ============================ SERVER ============================= **/
     /**
