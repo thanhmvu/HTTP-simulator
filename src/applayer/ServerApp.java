@@ -40,7 +40,7 @@ public class ServerApp {
     private void listen() throws InterruptedException, IOException {
         while (true) {
             //receive message from client, and send the "received" message back.
-            byte[] byteArray = transportLayer.receive();
+            byte[] byteArray = transportLayer.receiveForServer();
             //if client disconnected
             if (byteArray == null) {
                 break;
@@ -55,7 +55,7 @@ public class ServerApp {
             ResponsePacket resPacket = respond(reqPacket);
             String response = resPacket.toProtocol();
 
-            transportLayer.send(response.getBytes(), reqPacket.getVersion());
+            transportLayer.sendForServer(response.getBytes(), reqPacket.getVersion());
 
         }
     }

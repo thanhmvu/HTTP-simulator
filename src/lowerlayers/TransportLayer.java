@@ -93,26 +93,30 @@ public class TransportLayer {
                 
                 this.remainingRequests++;
             }
+        } else {
+            print("ERROR: Not a client or not HTTP 1.2");
         }
     }
     
     public ArrayList<ResponsePacket> receiveMultiForClient(double httpVersion) 
             throws InterruptedException 
     {
-        ArrayList<ResponsePacket> resPackets = new ArrayList<>();
-        while(this.remainingRequests > 0){
-            byte[] payload = receive();
-            ResponsePacket resPacket = new ResponsePacket(new String(payload));
-            resPackets.add(resPacket);
-            
-            // if non-persistent, Close connection when client received the packet
-            if (httpVersion == 1.0 && !server) {
-                closeConnection();
+        if(!server && httpVersion == 1.2){
+            ArrayList<ResponsePacket> resPackets = new ArrayList<>();
+            while(this.remainingRequests > 0){
+                byte[] payload = receive();
+                ResponsePacket resPacket = new ResponsePacket(new String(payload));
+                resPackets.add(resPacket);
+
+                this.remainingRequests--;
             }
-            
-            this.remainingRequests--;
+            // close connection when get the whole list of response packets
+            closeConnection();
+            return resPackets;
+        } else {
+            print("ERROR: Not a client or not HTTP 1.2");
         }
-        return resPackets;
+        return null;
     }
     
     /** ============================ SERVER ============================= **/
@@ -123,41 +127,31 @@ public class TransportLayer {
      * @param httpVersion HTTP version 1.0, 1.1, 1.2
      * @throws InterruptedException If the thread is disrupted
      */
-    public void send(byte[] payload, double httpVersion) throws InterruptedException {
-        handShakeIfNoConnection();
-        if (payload == null) {
-            closeConnection();
-            return;
-        }
-        print("sending packet of size " + payload.length + "bytes");
-        networkLayer.send(payload);
-        // if non-persistent, Close connection when client received the packet
-        if (httpVersion == 1.0 && server) {
-            closeConnection();
+    public void sendForServer(byte[] payload, double httpVersion) throws InterruptedException {
+        if(server){
+            handShakeIfNoConnection();
+            if (payload == null) {
+                closeConnection();
+                return;
+            }
+            print("sending packet of size " + payload.length + "bytes");
+            networkLayer.send(payload);
+            // if non-persistent, Close connection when client received the packet
+            if (httpVersion == 1.0) {
+                closeConnection();
+            }
+        } else {
+            print("ERROR: Not a server");
         }
     }
 
-    // make this private after separate client-server
-    public byte[] receive() throws InterruptedException {
-        handShakeIfNoConnection();
-        byte[] payload = networkLayer.receive();
-
-        //handling null payload
-        if (payload == null) {
-            closeConnection();
-            return null;
+    public byte[] receiveForServer() throws InterruptedException {
+        if(server){
+            return receive();
+        } else {
+            print("ERROR: Not a server");
         }
-
-        print("receiving packet of size " + payload.length + "bytes");
-        return payload;
-    }
-
-    /**
-     * Close the connection established by transport layer
-     */
-    private void closeConnection() {
-        print(server ? "Server closes connection" : "Client closes connection");
-        connectionOpen = false;
+        return null;
     }
     
     //============SET PARAMETER METHODS=============================
@@ -243,12 +237,36 @@ public class TransportLayer {
     }
 
     //===================HELPER METHODS==================================
+
+    // make this private after separate client-server
+    private byte[] receive() throws InterruptedException {
+        handShakeIfNoConnection();
+        byte[] payload = networkLayer.receive();
+
+        //handling null payload
+        if (payload == null) {
+            closeConnection();
+            return null;
+        }
+
+        print("receiving packet of size " + payload.length + "bytes");
+        return payload;
+    }
+
+    /**
+     * Close the connection established by transport layer
+     */
+    private void closeConnection() {
+        print(server ? "Server closes connection" : "Client closes connection");
+        connectionOpen = false;
+    }
+    
     /**
      * Method to print transport layer logs in a specific format
      *
      * @param s string to print
      */
-    public static void print(String s) {
+    private static void print(String s) {
         System.out.println(">>>>> [TL] " + s);
     }
 }

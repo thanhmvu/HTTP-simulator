@@ -140,28 +140,32 @@ public class ClientApp {
 
     private HashMap<String, String> receiveMulti(ArrayList<RequestPacket> reqPackets)
             throws InterruptedException {
-        byte[] byteArray = transportLayer.receiveForClient(httpVersion);
-        String response = new String(byteArray);
-        ResponsePacket resPacket = new ResponsePacket(response);
+        ArrayList<ResponsePacket> resPackets = 
+                transportLayer.receiveMultiForClient(httpVersion);
 
-        HashMap<String, String> requestedObj = null;
-//        switch (resPacket.getStatusCode()) {
-//            case 200: // OK
-//                requestedObj = resPacket.getBody();
-//                // cache the recieved object
-//                localCache.cache(reqPacket.getUrl(),
-//                        resPacket.getValue("Last-Modified"),
-//                        requestedObj);
-//                break;
-//            case 304: // Not modified
-//                requestedObj = localCache.getCachedContent(reqPacket.getUrl());
-//                break;
-//            case 404: // Not found
-//                requestedObj = resPacket.getBody();
-//                break;
-//        }
-
-        return requestedObj;
+        HashMap<String, String> pages = null;
+        for(ResponsePacket resPacket: resPackets){
+            String url = resPacket.getValue("URL");
+            switch (resPacket.getStatusCode()) {
+                case 200: // OK
+                    print("receiving "+url+". Status 200");
+                    pages.put(url, resPacket.getBody());
+                    // cache the recieved object
+                    localCache.cache(url,
+                            resPacket.getValue("Last-Modified"),
+                            resPacket.getBody());
+                    break;
+                case 304: // Not modified
+                    print(url + "is not modified. Retrieved from cached.");
+                    pages.put(url, localCache.getCachedContent(url));
+                    break;
+                case 404: // Not found
+                    pages.put(url, resPacket.getBody());
+                    break;
+            }
+        }
+        
+        return pages;
     }
 
     /**
