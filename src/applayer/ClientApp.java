@@ -80,7 +80,7 @@ public class ClientApp {
             requestMulti(reqPackets);
             HashMap<String,String> pages = receiveMulti(reqPackets); // <url, content>
 
-            // recursively retrieve embedded files
+            // recursively create Doc and retrieve embedded files
             for(String url: pages.keySet()){
                 // Convert text to Document
                 Document doc = new Document(url, pages.get(url));
@@ -106,9 +106,8 @@ public class ClientApp {
             } else {
                 System.out.println("No existing cache found. Send normal GET");
             }
-            
-            transportLayer.sendMultiForClient(reqPackets, httpVersion);
         }
+        transportLayer.sendMultiForClient(reqPackets, httpVersion);
     }
 
     private HashMap<String,String> receiveMulti(ArrayList<RequestPacket> reqPackets) 
@@ -173,6 +172,7 @@ public class ClientApp {
     }
 
     private void request(RequestPacket reqPacket) throws InterruptedException {
+//        long start = System.currentTimeMillis();
         // check if object was cached before
         if (localCache.existsInCache(reqPacket.getUrl())) {
             reqPacket.addHeading("If-modified-since", 
@@ -181,6 +181,8 @@ public class ClientApp {
         } else {
             System.out.println("No existing cache found. Send normal GET");
         }
+//        long end = System.currentTimeMillis();
+//        print("Time to check cache: " + (end-start) + " ms");
 
         // convert request to byte array and send to transport layer
         byte[] byteArray = reqPacket.toProtocol().getBytes();
@@ -189,6 +191,8 @@ public class ClientApp {
 
     private String receive(RequestPacket reqPacket) throws InterruptedException {
         byte[] byteArray = transportLayer.receiveForClient(httpVersion);
+        
+//        long start = System.currentTimeMillis();
         String response = new String(byteArray);
         ResponsePacket resPacket = new ResponsePacket(response);
 
@@ -208,6 +212,8 @@ public class ClientApp {
                 requestedObj = resPacket.getBody();
                 break;
         }
+//        long end = System.currentTimeMillis();
+//        print("Time to get to extract the content: " + (end-start) + " ms");
 
         return requestedObj;
     }
