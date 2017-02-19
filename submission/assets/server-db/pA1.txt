@@ -1,0 +1,11 @@
+pA1.txt 
+1 child:
+<<school/cA11.txt>>
+data data data data
+data data data data
+data data data data
+data data data data
+data data data data
+data data data data
+data data data data
+data data data data

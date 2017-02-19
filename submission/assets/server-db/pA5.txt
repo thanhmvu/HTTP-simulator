@@ -1,0 +1,11 @@
+pA5.txt 
+5 children:
+<<school/cA51.txt>>
+<<school/cA52.txt>>
+<<school/cA53.txt>>
+<<school/cA54.txt>>
+<<school/cA55.txt>>
+data data data data
+data data data data
+data data data data
+data data data data

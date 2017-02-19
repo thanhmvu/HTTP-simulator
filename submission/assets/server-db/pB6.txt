@@ -1,0 +1,11 @@
+pB6.txt 
+6 children:
+<<school/cB61.txt>>
+<<school/cB62.txt>>
+<<school/cB63.txt>>
+<<school/cB64.txt>>
+<<school/cB65.txt>>
+<<school/cB66.txt>>
+data data data data
+data data data data
+data data data data

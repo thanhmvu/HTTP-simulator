@@ -1,0 +1,11 @@
+pA8.txt 
+8 children:
+<<school/cA81.txt>>
+<<school/cA82.txt>>
+<<school/cA83.txt>>
+<<school/cA84.txt>>
+<<school/cA85.txt>>
+<<school/cA86.txt>>
+<<school/cA87.txt>>
+<<school/cA88.txt>>
+data data data data

@@ -1,0 +1,11 @@
+pA2.txt 
+2 children:
+<<school/cA21.txt>>
+<<school/cA22.txt>>
+data data data data
+data data data data
+data data data data
+data data data data
+data data data data
+data data data data
+data data data data

@@ -1,0 +1,11 @@
+pB8.txt 
+8 children:
+<<school/cB81.txt>>
+<<school/cB82.txt>>
+<<school/cB83.txt>>
+<<school/cB84.txt>>
+<<school/cB85.txt>>
+<<school/cB86.txt>>
+<<school/cB87.txt>>
+<<school/cB88.txt>>
+data data data data

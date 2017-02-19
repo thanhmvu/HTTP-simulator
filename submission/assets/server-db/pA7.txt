@@ -1,0 +1,11 @@
+pA7.txt 
+7 children:
+<<school/cA71.txt>>
+<<school/cA72.txt>>
+<<school/cA73.txt>>
+<<school/cA74.txt>>
+<<school/cA75.txt>>
+<<school/cA76.txt>>
+<<school/cA77.txt>>
+data data data data
+data data data data

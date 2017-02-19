@@ -1,0 +1,11 @@
+pB5.txt 
+5 children:
+<<school/cB51.txt>>
+<<school/cB52.txt>>
+<<school/cB53.txt>>
+<<school/cB54.txt>>
+<<school/cB55.txt>>
+data data data data
+data data data data
+data data data data
+data data data data

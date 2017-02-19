@@ -1,0 +1,11 @@
+pB9.txt 
+9 children:
+<<school/cB91.txt>>
+<<school/cB92.txt>>
+<<school/cB93.txt>>
+<<school/cB94.txt>>
+<<school/cB95.txt>>
+<<school/cB96.txt>>
+<<school/cB97.txt>>
+<<school/cB98.txt>>
+<<school/cB99.txt>>
