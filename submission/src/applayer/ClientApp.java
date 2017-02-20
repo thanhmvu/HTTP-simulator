@@ -134,6 +134,7 @@ public class ClientApp {
         // check if object was cached before
         for (RequestPacket reqPacket : reqPackets) 
         {
+            print("------------------------------Processing "+reqPacket.getUrl());
             if (localCache.existsInCache(reqPacket.getUrl())) 
             {
                 reqPacket.addHeading("If-modified-since",
@@ -262,6 +263,7 @@ public class ClientApp {
 
     private void request(RequestPacket reqPacket) throws InterruptedException {
 //        long start = System.currentTimeMillis();
+        print("------------------------------Processing "+reqPacket.getUrl());
         // check if object was cached before
         if (localCache.existsInCache(reqPacket.getUrl())) {
             reqPacket.addHeading("If-modified-since",
@@ -275,6 +277,7 @@ public class ClientApp {
 
         // convert request to byte array and send to transport layer
         byte[] byteArray = reqPacket.toProtocol().getBytes();
+//        print("Sending the following packet:\n"+ reqPacket.toProtocol());
         transportLayer.sendForClient(byteArray, httpVersion);
     }
 
@@ -284,6 +287,7 @@ public class ClientApp {
 //        long start = System.currentTimeMillis();
         String response = new String(byteArray);
         ResponsePacket resPacket = new ResponsePacket(response);
+        print("Receiving the following packet:\n"+ resPacket.toProtocol());
 
         String requestedObj = null;
         switch (resPacket.getStatusCode()) {

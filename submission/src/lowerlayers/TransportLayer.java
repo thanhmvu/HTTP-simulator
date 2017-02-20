@@ -93,12 +93,14 @@ public class TransportLayer {
                 
                 // send to network layer
                 byte[] payload = reqPacket.toProtocol().getBytes();
+//                print("Sending the following packet:\n"+ reqPacket.toProtocol());
                 print("sending packet of size " + payload.length + "bytes");
                 networkLayer.send(payload);
                 
                 // receive from network layer
                 payload = receive();
                 ResponsePacket resPacket = new ResponsePacket(new String(payload));
+                print("Receiving the following packet:\n"+ resPacket.toProtocol());
                 resPackets.add(resPacket);
             }
             
