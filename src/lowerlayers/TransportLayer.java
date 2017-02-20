@@ -93,7 +93,7 @@ public class TransportLayer {
                 
                 // send to network layer
                 byte[] payload = reqPacket.toProtocol().getBytes();
-                print("Sending the following packet:\n"+ reqPacket.toProtocol());
+//                print("Sending the following packet:\n"+ reqPacket.toProtocol());
                 print("sending packet of size " + payload.length + "bytes");
                 networkLayer.send(payload);
                 
